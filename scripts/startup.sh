@@ -7,8 +7,8 @@ cd /home/scripts
 . ./selfcheck.sh
 if [ $selfcheck_fail -eq 1 ]
 then
-echo Selfcheck fehlgeschlagen! Stoppe Container...
-exit 0
+  echo Selfcheck fehlgeschlagen! Stoppe Container...
+  exit 0
 else
-/bin/sh
+  /bin/sh
 fi
