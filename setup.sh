@@ -37,7 +37,6 @@ check () {
     mv $1_temp $1
     chmod +x $1
     echo Update erfolgreich \($1\).
-    update="true"
     if [ $1 = "cron_update.sh" ]
     then
     ./cron_update.sh
@@ -54,7 +53,6 @@ check () {
   fi
 }
 
-update="false"
 cd /home/scripts
 counter=0
 download backup_script.sh
@@ -67,8 +65,3 @@ download startup.sh
 check startup.sh
 download selfcheck.sh
 check selfcheck.sh
-
-if [ update = "true" ] 
-then
-echo Hier kommt was hin
-fi
