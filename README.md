@@ -21,7 +21,7 @@ Der Container basiert auf Alpine Linux.
 |Notwendige Volumen|Host-Pfad|Container-Pfad|
 |--|--|--| 
 |Speicherort für Backup-Daten|Frei wählbar|/mnt/lokal|
-|Config-Ordner (SSH-Keys)|Frei wählbar|/config|
+|Config-Ordner (SSH-Keys & Logs)|Frei wählbar|/config|
 ---
 |Variable|Format|Notwendig?|Info
 |--|--|--|--|
