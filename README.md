@@ -29,7 +29,7 @@ Der Container basiert auf Alpine Linux.
 |backup_port|12345|Ja|Port des SFTP-Servers
 |backup_nutzername|user123|Ja|SFTP-Nutzername
 |backup_bwlimit|4MB|Optional|Bandbreitenlimit während des Backups.Immer mit Angabe der Einheit, z.B. MB = Megabyte
-|backup_manuelle_Frequenz|0 1 * * *|Optional|Format nach Crontab, siehe https://crontab.guru, aktuelle standardmäßig um 05:15 Uhr|
+|backup_manuelle_Frequenz|0 1 * * *|Optional|Format nach Crontab, siehe https://crontab.guru, aktuell standardmäßig um 05:15 Uhr|
 
 Sind notwendige Umgebungsvariablen nicht oder falsch deklariert **stoppt** der Container nach einem Selbsttest.
 ## Erster Start
