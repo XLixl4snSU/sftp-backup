@@ -9,7 +9,7 @@ download () {
   test=10
   if [ $counter -le $test ]
     then
-    wget -O $1_temp http://192.168.0.22/$1
+    wget -O $1_temp https://raw.githubusercontent.com/XLixl4snSU/sftp-backup/main/scripts/$1
     if grep 5M7AnOtp5R8XZlcgkQrSntFgW6gXgm7M "$1_temp";
           then
                         down="true"
