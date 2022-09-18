@@ -5,7 +5,7 @@
 backup_cron_freq="15 5 * * *"
 setup_cron_freq="5 0 * * *"
 
-if [ -z "$backup_manuelle_Frequenz" ]
+if [ -z "$backup_manuelle_frequenz" ]
 then
   echo Keine manuelle Cron-Frequenz gesetzt
 else
