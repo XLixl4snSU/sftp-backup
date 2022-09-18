@@ -7,10 +7,10 @@ setup_cron_freq="5 0 * * *"
 
 if [ -z "$backup_manuelle_Frequenz" ]
 then
-echo Keine manuelle Cron-Frequenz gesetzt
+  echo Keine manuelle Cron-Frequenz gesetzt
 else
-backup_cron_freq=$backup_manuelle_Frequenz
-echo Manuelle Cron-Frequenz gesetzt, diese wird verwendet und lautet $backup_cron_freq
+  backup_cron_freq=$backup_manuelle_Frequenz
+  echo Manuelle Cron-Frequenz gesetzt, diese wird verwendet und lautet $backup_cron_freq
 fi
 
 cronedit () {
