@@ -22,7 +22,7 @@ else
 fi
 echo Baue SFTP-Verbindung auf...
 set -x
-timeout -k 1 4 sshfs -p $backup_port -o BatchMode=yes,IdentityFile=/home/ssh/ssh_host_rsa_key,StrictHostKeyChecking=accept-new,_netdev,reconnect $backup_nutzername@$backup_adresse:/ /mnt/sftp/
+sshfs -p $backup_port -o BatchMode=yes,IdentityFile=/home/ssh/ssh_host_rsa_key,StrictHostKeyChecking=accept-new,_netdev,reconnect $backup_nutzername@$backup_adresse:/ /mnt/sftp/
 set +x
 sleep 3
 echo Prüfe eingebundenes Verzeichnis...
