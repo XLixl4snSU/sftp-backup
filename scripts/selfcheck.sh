@@ -33,6 +33,7 @@ then
   umount -lf /mnt/sftp/
   selfcheck_fail=1
 else
+  echo Selfcheck bestanden.
   umount -lf /mnt/sftp/
   selfcheck_fail=0
 fi
