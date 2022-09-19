@@ -10,7 +10,6 @@ then
   echo Selfcheck fehlgeschlagen! Stoppe Container...
   exit 0
 else
-  echo Starte dauerhafte Shell
   /bin/sh
-  echo Dieser Text wird ausgelöst nach der Shell
+  sleep infinity
 fi
