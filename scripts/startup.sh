@@ -3,8 +3,8 @@
 
 # Editable Variables:
 cd /home/scripts
-. ./setup.sh
 . ./selfcheck.sh
+. ./cron_update.sh
 if [ $selfcheck_fail -eq 1 ]
 then
   echo Selfcheck fehlgeschlagen! Stoppe Container...

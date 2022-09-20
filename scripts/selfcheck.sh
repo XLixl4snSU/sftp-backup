@@ -8,7 +8,7 @@ if [ -f "/config/public_key" ] && [ -f "/config/private_key" ]; then
 	cp /config/public_key /home/ssh/ssh_host_rsa_key.pub
 	cp /config/private_key /home/ssh/ssh_host_rsa_key
 else
-    echo Key wird erstellt und kopiert.
+    echo Key wird neu erstellt und kopiert.
 	rm -rf /home/ssh/*
 	rm -rf /config/public_key
 	rm -rf /config/private_key
@@ -24,7 +24,7 @@ echo Baue SFTP-Verbindung auf...
 set -x
 sshfs -p $backup_port -o BatchMode=yes,IdentityFile=/home/ssh/ssh_host_rsa_key,StrictHostKeyChecking=accept-new,_netdev,reconnect $backup_nutzername@$backup_adresse:/ /mnt/sftp/
 set +x
-sleep 3
+sleep 2
 echo Prüfe eingebundenes Verzeichnis...
 if [ ! -d "/mnt/sftp/backup" ]
 then
