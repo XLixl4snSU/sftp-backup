@@ -21,6 +21,8 @@ cronedit () {
   echo "$setup_cron_freq /home/scripts/setup.sh">>cron.temp
   crontab cron.temp
   rm -f cron.temp
+  echo Crontab aktualisiert. Starte crond.
+  crond -b
 }
 
 cronedit
