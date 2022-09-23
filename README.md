@@ -1,3 +1,4 @@
+
 # Backup-Script
 
 **If you don't know what this project is, you don't need it.**
@@ -29,7 +30,7 @@ Der Container basiert auf Alpine Linux.
 |backup_port|12345|Ja|Port des SFTP-Servers
 |backup_nutzername|user123|Ja|SFTP-Nutzername
 |backup_bwlimit|4MB|Optional|Bandbreitenlimit während des Backups.Immer mit Angabe der Einheit, z.B. MB = Megabyte
-|backup_manuelle_frequenz|0 1 * * *|Optional|Format nach Crontab, siehe https://crontab.guru, aktuell standardmäßig um 05:15 Uhr|
+|backup_manuelle_frequenz|10 3 * * *|Optional|Format nach Crontab, siehe https://crontab.guru, aktuell standardmäßig um 03:10 Uhr|
 
 Sind notwendige Umgebungsvariablen nicht oder falsch deklariert **stoppt** der Container nach einem Selbsttest.
 ## Erster Start
@@ -46,4 +47,3 @@ Dieser Container **stoppt nicht**, wenn ein Backup fehlschlägt oder der SFTP-Se
 Dieser Container updatet in einem vom Ersteller festgelegten Intervall automatisch die im Container verwendeten Scripte, tut das aber auch bei jedem Start.
 
 Dieser Container **speichert Logdateien** im Ordner /config/logs: Diese sind aktuell bei Bedarf manuell zu löschen.
-
