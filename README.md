@@ -8,14 +8,29 @@
 ## Was dieser Container macht
 Es handelt sich um eine individuelle Lösung um Dateien mit einer Server-Client-Architektur zu sichern. Hierbei hat der Client nur lesenden Zugriff auf die Daten des Servers und der Server hat keinen Zugriff auf Daten des Clients.
 Das Backup wird über eine SFTP-Verbindung mittels rsync zu einer festgelegten Zeit durchgeführt
-## Docker Features
+## Container Features
 Dieser Container kann von DockerHub bezogen werden.
 
     butti/sftp-backup
 
 https://hub.docker.com/r/butti/sftp-backup
 
-Der Container basiert auf Alpine Linux.
+---
+Der Container kann außerdem von Githubs Container registry bezogen werden.
+
+    ghcr.io/xlixl4snsu/sftp-backup
+
+https://github.com/XLixl4snSU/sftp-backup/pkgs/container/sftp-backup
+
+---
+Core-Features:
+
+ - Alpine Linux als Basis
+ - Backups von Dateien eines SFTP-Servers zu einem definierbaren Zeitpunkt täglich
+ - Authentication mittels SSH-Keys
+ - Einfach nutzbarer Log
+
+Der Container wird bei Release einer neuen Version auf Github **automatisch** zu den Repositories gepusht und kann sofort geupdatet werden.
 
 ## Variablen und Volumen
 
