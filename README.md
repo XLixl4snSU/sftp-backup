@@ -29,6 +29,7 @@ Es handelt sich um einen Docker-Container. Das Image kann von Registries bezogen
 |--|--|
 |[Github Container Registry](https://github.com/XLixl4snSU/sftp-backup/pkgs/container/sftp-backup)|`ghcr.io/xlixl4snsu/sftp-backup`
 | [Dockerhub](https://hub.docker.com/r/butti/sftp-backup) | `butti/sftp-backup` |
+
 Der Container wird bei Release einer neuen Version auf Github **automatisch** zu den Repositories gepusht und kann sofort geupdatet werden.
 ### Selbst bauen
 Release laden, entpacken und im Rootverzeichnis Kommando ausführen (erfordert die Installation von [Docker](https://docs.docker.com/engine/install/)):
