@@ -10,6 +10,7 @@ then
   echo Selfcheck fehlgeschlagen! Stoppe Container...
   exit 0
 else
+  echo Selfcheck erfolgreich. Container läuft.
   /bin/sh
   sleep infinity
 fi
