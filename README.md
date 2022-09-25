@@ -1,3 +1,4 @@
+
 ![](https://img.shields.io/github/workflow/status/XLixl4snSU/sftp-backup/Docker?style=for-the-badge)
 ![enter image description here](https://img.shields.io/github/release-date/XLixl4snSU/sftp-backup?style=for-the-badge)   ![enter image description here](https://img.shields.io/docker/v/butti/sftp-backup?style=for-the-badge) ![enter image description here](https://img.shields.io/docker/image-size/butti/sftp-backup?style=for-the-badge) ![enter image description here](https://img.shields.io/docker/pulls/butti/sftp-backup?style=for-the-badge)
 # sftp-backup - Backup Script
@@ -19,7 +20,9 @@ Das Backup wird über eine SFTP-Verbindung mittels rsync zu einer festgelegten Z
 **Core-Features:**
 
  - Alpine Linux als Basis
- - Backups von Dateien eines SFTP-Servers zu einem definierbaren Zeitpunkt täglich
+ - Backups von Dateien eines SFTP-Servers zu einem definierbaren Zeitpunkt einmal täglich
+ - Inkrementelle Backups mit frei wählbarer Retention-Anzahl
+	 - Einzelne Backups können dank Hardlinks ohne Einfluss auf andere Backups jederzeit gelöscht werden
  - Authentication mittels SSH-Keys
  - Einfach zugänglicher Log
 ## Installation und Setup
@@ -67,6 +70,7 @@ Innerhalb des SFTP-Root-Verzeichnisses erwartet dieser Container einen Ordner "b
 |backup_nutzername|user123|Ja|SFTP-Nutzername
 |backup_bwlimit|4MB|Optional|Bandbreitenlimit während des Backups.Immer mit Angabe der Einheit, z.B. MB = Megabyte
 |backup_manuelle_frequenz|10 3 * * *|Optional|Format nach Crontab, siehe https://crontab.guru, aktuell standardmäßig um 03:10 Uhr|
+|backup_retention_number|7| Optional|Behält die letzten X täglichen Sicherungen, Standardwert 7
 
 Sind notwendige Umgebungsvariablen nicht oder falsch deklariert **stoppt** der Container nach einem Selbsttest.
 
@@ -76,6 +80,15 @@ Dieser Container **stoppt nicht**, wenn ein Backup fehlschlägt oder der SFTP-Se
 
 Befindet sich zum avisierten Zeitpunkt des Backups eine Datei `file.lock` im Verzeichnis `backup/`wird die ausführung des Backups so lange um jeweils 60 Sekunden verschoben, bis die Datei nicht mehr existiert.
 
-Die Ausführung des Backups erfolgt mittels cron. Ein Lockfile sorgt dafür, dass der Cronjob nicht mehrmals gleichzeitig ausgeführt wird.
+Die Ausführung des Backups erfolgt einmal täglich mittels cron. Ein Lockfile sorgt dafür, dass der Cronjob nicht mehrmals gleichzeitig ausgeführt wird.
+
+#### Backup-Funktionalität:
+- Unabhängig vom Cronjob wird immer nur ein gleichzeitiges Backup des selben Tages angelegt, bei erneutem ausführen wird das bisherige Backup überschrieben
+- Die Backups befinden sich in Ordnern des Formats `YYYY-MM-DD`
+- Ist noch kein Ordner im Format vorhanden, erfolgt ein erstes Voll-Backup. Alle nachfolgenden Backups verwenden stets Hardlinks mit Basis des jeweils letzten Backups zur Sicherung
+- Es kann jederzeit jede Backup-Version unabhängig von allen anderen Backups gelöscht werden, dies hat keinen Effekt auf andere Backup-Versionen.
+- **Achtung:** im Rahmen des Backup-Scripts werden alle fremden Ordner im gewählten Backup-Verzeichnis gelöscht. Das trifft **nicht** auf einzelne Dateien zu.
+- Das Script prüft nach Ausführung eines Backups ob mehr als die in `backup_retention_number` definierten Backups vorhanden sind. Wenn ja, wird das jeweils **älteste** Backup gelöscht.
+- Existiert bereits vor der Nutzung ein volles Backup, kann dieses einfach in einen Ordner mit dem aktuellen Datum im Format `YYYY-MM-DD` verschoben werden. Es dient dann als Basis für zukünftige Backups.
 
 Dieser Container **speichert Logdateien** im Ordner /config/logs: Diese sind aktuell bei Bedarf manuell zu löschen.
