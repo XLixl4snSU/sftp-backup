@@ -1,6 +1,8 @@
 
 ![](https://img.shields.io/github/workflow/status/XLixl4snSU/sftp-backup/Docker?style=for-the-badge)
-![enter image description here](https://img.shields.io/github/release-date/XLixl4snSU/sftp-backup?style=for-the-badge)   ![enter image description here](https://img.shields.io/docker/v/butti/sftp-backup?style=for-the-badge) ![enter image description here](https://img.shields.io/docker/image-size/butti/sftp-backup?style=for-the-badge) ![enter image description here](https://img.shields.io/docker/pulls/butti/sftp-backup?style=for-the-badge)
+![](https://img.shields.io/github/release-date/XLixl4snSU/sftp-backup?style=for-the-badge)
+![](https://img.shields.io/docker/v/butti/sftp-backup/latest?style=for-the-badge)
+![](https://img.shields.io/docker/image-size/butti/sftp-backup?style=for-the-badge) ![enter image description here](https://img.shields.io/docker/pulls/butti/sftp-backup?style=for-the-badge)
 # sftp-backup - Backup Script
 **If you don't know what this project is, you won't need it.**
 
