@@ -54,7 +54,7 @@ then
   done
   heute=$(date +%F)
   mkdir -p $dest_folder$heute
-  rsync -avq --stats --delete --log-file $logs_folder"rsync-"$heute".log" --bwlimit $backup_bwlimit --link-dest=$dest_folder$last_backup/ $sftp_folder $dest_folder$heute/
+  rsync -avq --stats --delete --log-file $logs_folder"rsync-"$heute".log" --bwlimit $backup_bwlimit --link-dest=$dest_folder$last_backup/ $sftp_folder $dest_folder$heute
   
   echo $(date)": Inkrementelles Backup beendet. Kopiere Logdatei auf Server..."
 
@@ -62,7 +62,7 @@ else
   heute=$(date +%F)
   mkdir -p $dest_folder$heute
   echo $(date)": Es existiert noch kein Backup. Erstelle initiales Backup. Logs unter logs/duplicati-sftp-$heute.log"
-  rsync -avq --stats --delete --log-file $logs_folder"rsync-"$heute".log" --bwlimit $backup_bwlimit $sftp_folder $dest_folder$heute/
+  rsync -avq --stats --delete --log-file $logs_folder"rsync-"$heute".log" --bwlimit $backup_bwlimit $sftp_folder $dest_folder$heute
   echo $(date)": Initiales Backup beendet. Kopiere Logdatei auf Server..."
 fi
 
