@@ -1,4 +1,5 @@
 
+
 ![](https://img.shields.io/github/workflow/status/XLixl4snSU/sftp-backup/Docker?style=for-the-badge)
 ![](https://img.shields.io/github/release-date/XLixl4snSU/sftp-backup?style=for-the-badge)
 ![](https://img.shields.io/docker/v/butti/sftp-backup/latest?style=for-the-badge)
@@ -93,5 +94,8 @@ Die Ausführung des Backups erfolgt einmal täglich mittels cron. Ein Lockfile s
 - **Achtung:** im Rahmen des Backup-Scripts werden alle fremden Ordner im gewählten Backup-Verzeichnis gelöscht. Das trifft **nicht** auf einzelne Dateien zu.
 - Das Script prüft nach Ausführung eines Backups ob mehr als die in `backup_retention_number` definierten Backups vorhanden sind. Wenn ja, wird das jeweils **älteste** Backup gelöscht.
 - Existiert bereits vor der Nutzung ein volles Backup, kann dieses einfach in einen Ordner mit dem aktuellen Datum im Format `YYYY-MM-DD` verschoben werden. Es dient dann als Basis für zukünftige Backups.
+- Backups, die am Ende des Rsync-Vorgangs nicht **exakt** in Größe dem Ursprung entsprechen werden zur Vermeidung korrupter Backups gelöscht. Ein Backup muss dann erneut erfolgen, bspw. am nächsten Tag oder manuell
 
 Dieser Container **speichert Logdateien** im Ordner /config/logs: Diese sind aktuell bei Bedarf manuell zu löschen.
+
+Es kann durch die Ausführung von `./backup-now` im Root-Verzeichnis jederzeit ein sofortiges Backup angestoßen werden.
