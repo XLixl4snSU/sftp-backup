@@ -27,7 +27,16 @@ fi
 echo "Verwende Bandbreitenlimit: $backup_bwlimit"
 echo "Binde SFTP-Verzeichnis ein."
 
-sshfs -p $backup_port -o BatchMode=yes,IdentityFile=/home/ssh/ssh_host_rsa_key,StrictHostKeyChecking=accept-new,_netdev,reconnect $backup_nutzername@$backup_adresse:/ /mnt/sftp/
+sshfs -v -p $backup_port -o BatchMode=yes,IdentityFile=/home/ssh/ssh_host_rsa_key,StrictHostKeyChecking=accept-new,_netdev,reconnect,ServerAliveInterval=15,ServerAliveCountMax=3,ConnectTimeout=20 $backup_nutzername@$backup_adresse:/ /mnt/sftp/
+
+if [ ! -d "$sftp_folder" ]
+then
+  echo "Fehler bei der SSH-Verbindung! Ordner konnte nicht eingebunden werden. Breche ab."
+  umount -lf /mnt/sftp/
+  exit 0
+fi
+
+cp -rf $logs_folder* $stat_folder
 
 while [ -f "$sftp_folder"file.lock"" ]
 do
@@ -53,20 +62,41 @@ then
     fi
   done
   heute=$(date +%F)
-  mkdir -p $dest_folder$heutersync -avq --stats --delete --log-file $logs_folder"rsync-"$heute".log" --bwlimit $backup_bwlimit --link-dest=$dest_folder$last_backup/ $sftp_folder $dest_folder$heute/
-  
-  echo $(date)": Inkrementelles Backup beendet. Kopiere Logdatei auf Server..."
+  mkdir -p $dest_folder$heute
+  rsync -avq --no-perms --delete --timeout=30 --stats --log-file $logs_folder"rsync-"$heute".log" --bwlimit $backup_bwlimit --link-dest=$dest_folder$last_backup/ $sftp_folder $dest_folder$heute
+  echo $(date)": Rsync beendet. Prüfe Backup..."
+  size_dest=$(du $dest_folder$heute | cut -f1)
+  size_origin=$(du $sftp_folder | cut -f1)
+  if [ "$size_dest" -eq "$size_origin" ]
+  then
+    echo $(date)": Inkrementelles Backup erfolgreich beendet. Kopiere Logdatei auf Server..."
+  else
+    echo $(date)": Fehler! Backup stimmt nicht mit Original überein. Größe SFTP: $size_origin Größe Backup: $size_dest"
+	echo $(date)": Lösche fehlerhaftes Backup!"
+	rm -rf $dest_folder$heute
+	exit 0
+   fi
 
 else
   heute=$(date +%F)
   mkdir -p $dest_folder$heute
   echo $(date)": Es existiert noch kein Backup. Erstelle initiales Backup. Logs unter logs/duplicati-sftp-$heute.log"
-  rsync -avq --stats --delete --log-file $logs_folder"rsync-"$heute".log" --bwlimit $backup_bwlimit $sftp_folder $dest_folder$heute/
-  echo $(date)": Initiales Backup beendet. Kopiere Logdatei auf Server..."
+  rsync -avq --no-perms --delete --timeout=30 --stats --log-file $logs_folder"rsync-"$heute".log" --bwlimit $backup_bwlimit $sftp_folder $dest_folder$heute
+  size_dest=$(du $dest_folder$heute | cut -f1)
+  size_origin=$(du $sftp_folder | cut -f1)
+  if [ "$size_dest" -eq "$size_origin" ]
+  then
+     echo $(date)": Initiales Backup beendet. Kopiere Logdatei auf Server..."
+  else
+    echo $(date)": Fehler! Backup stimmt nicht mit Original überein. Größe SFTP: $size_origin Größe Backup: $size_dest"
+	echo $(date)": Lösche fehlerhaftes Backup und beende Script!"
+	rm -rf $dest_folder$heute
+	exit 0
+   fi
 fi
 
 # Kopiere Logs
-cp $logs_folder"rsync-"$heute".log" $stat_folder"rsync-"$heute".log"
+cp -rf $logs_folder"rsync-"$heute".log" $stat_folder"rsync-"$heute".log"
 
 # Alte Backups löschen
 list=""
