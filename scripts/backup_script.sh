@@ -74,6 +74,7 @@ then
     echo $(date)": Fehler! Backup stimmt nicht mit Original überein. Größe SFTP: $size_origin Größe Backup: $size_dest"
 	echo $(date)": Lösche fehlerhaftes Backup!"
 	rm -rf $dest_folder$heute
+	cp -rf $logs_folder"rsync-"$heute".log" $stat_folder"rsync-"$heute".log"
 	exit 0
    fi
 
@@ -91,6 +92,7 @@ else
     echo $(date)": Fehler! Backup stimmt nicht mit Original überein. Größe SFTP: $size_origin Größe Backup: $size_dest"
 	echo $(date)": Lösche fehlerhaftes Backup und beende Script!"
 	rm -rf $dest_folder$heute
+	cp -rf $logs_folder"rsync-"$heute".log" $stat_folder"rsync-"$heute".log"
 	exit 0
    fi
 fi
