@@ -130,5 +130,6 @@ then
 else
   echo $(d)": Es müssen keine alten Backups gelöscht werden ($found von $backup_retention_number (Retention) Sicherungen vorhanden)."
 fi
+
 echo $(d)": Größe der Backup-Verzeichnisse: " $(du -sh $dest_folder) "(gesamt) Einzeln: "$(du -sh $dest_folder*)
 echo $(d)": Backup-Script beendet."
