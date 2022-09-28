@@ -1,5 +1,6 @@
 
 
+
 ![](https://img.shields.io/github/workflow/status/XLixl4snSU/sftp-backup/Docker?style=for-the-badge)
 ![](https://img.shields.io/github/release-date/XLixl4snSU/sftp-backup?style=for-the-badge)
 ![](https://img.shields.io/docker/v/butti/sftp-backup/latest?style=for-the-badge)
@@ -67,14 +68,15 @@ Innerhalb des SFTP-Root-Verzeichnisses erwartet dieser Container einen Ordner "b
 |Speicherort für Backup-Daten|Frei wählbar|/mnt/lokal|
 |Config-Ordner (SSH-Keys & Logs)|Frei wählbar|/config|
 ---
-|Variable|Format|Notwendig?|Info
-|--|--|--|--|
-|backup_adresse|backup.example.com|Ja| SFTP-Server-URL
-|backup_port|12345|Ja|Port des SFTP-Servers
-|backup_nutzername|user123|Ja|SFTP-Nutzername
-|backup_bwlimit|4MB|Optional|Bandbreitenlimit während des Backups.Immer mit Angabe der Einheit, z.B. MB = Megabyte
-|backup_manuelle_frequenz|10 3 * * *|Optional|Format nach Crontab, siehe https://crontab.guru, aktuell standardmäßig um 03:10 Uhr|
-|backup_retention_number|7| Optional|Behält die letzten X täglichen Sicherungen, Standardwert 7
+|Variable|Format|Notwendig?|Info|Standardwert
+|--|--|--|--|--|
+|backup_adresse|domain.com \| IP|Ja| SFTP-Server-URL|-
+|backup_port|Zahl (0-65535)|Ja|Port des SFTP-Servers|-
+|backup_nutzername|String|Ja|SFTP-Nutzername|-
+|backup_bwlimit|Zahl mit Einheit|Optional|Bandbreitenlimit während des Backups. Mit Angabe der Einheit, z.B. MB = Megabyte|4M
+|backup_manuelle_frequenz|Nach Crontab |Optional|Siehe https://crontab.guru|10 3 * * *
+|backup_retention_number|Ganzzahl| Optional|Behält die letzten X täglichen Sicherungen|7
+|TZ|Kontinent/Stadt|Optional|Zeitzone (siehe [Wikipedia](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones))|Europe/Berlin
 
 Sind notwendige Umgebungsvariablen nicht oder falsch deklariert **stoppt** der Container nach einem Selbsttest.
 
@@ -95,7 +97,6 @@ Die Ausführung des Backups erfolgt einmal täglich mittels cron. Ein Lockfile s
 - Das Script prüft nach Ausführung eines Backups ob mehr als die in `backup_retention_number` definierten Backups vorhanden sind. Wenn ja, wird das jeweils **älteste** Backup gelöscht.
 - Existiert bereits vor der Nutzung ein volles Backup, kann dieses einfach in einen Ordner mit dem aktuellen Datum im Format `YYYY-MM-DD` verschoben werden. Es dient dann als Basis für zukünftige Backups.
 - Backups, die am Ende des Rsync-Vorgangs nicht **exakt** in Größe dem Ursprung entsprechen werden zur Vermeidung korrupter Backups gelöscht. Ein Backup muss dann erneut erfolgen, bspw. am nächsten Tag oder manuell
+- Es kann durch die Ausführung von `./backup-now` im Root-Verzeichnis jederzeit ein sofortiges Backup angestoßen werden.
 
 Dieser Container **speichert Logdateien** im Ordner /config/logs: Diese sind aktuell bei Bedarf manuell zu löschen.
-
-Es kann durch die Ausführung von `./backup-now` im Root-Verzeichnis jederzeit ein sofortiges Backup angestoßen werden.

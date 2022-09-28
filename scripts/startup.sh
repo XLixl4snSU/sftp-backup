@@ -3,7 +3,11 @@
 
 # Editable Variables:
 
-cp /usr/share/zoneinfo/Europe/Berlin /etc/localtime
+if [ -z "$TZ" ]
+then
+  export TZ=Europe/Berlin
+fi
+
 cd /home/scripts
 . ./selfcheck.sh
 . ./cron_update.sh
