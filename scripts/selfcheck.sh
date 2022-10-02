@@ -1,7 +1,6 @@
-#!/bin/sh
-# DO NOT MODIFY THIS LINE 5M7AnOtp5R8XZlcgkQrSntFgW6gXgm7M
+#!/bin/bash
 
-echo Selfcheck starten.
+echo "Selfcheck starten."
 mkdir /config/logs
 if [ -f "/config/public_key" ] && [ -f "/config/private_key" ]; then
     echo "Key existiert. Dieser wird verwendet."
