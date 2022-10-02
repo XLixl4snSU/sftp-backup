@@ -1,9 +1,7 @@
-#!/bin/sh
-# DO NOT MODIFY THIS LINE 5M7AnOtp5R8XZlcgkQrSntFgW6gXgm7M
+#!/bin/bash
 
 # Editable Variables:
 backup_cron_freq="10 3 * * *"
-setup_cron_freq="5 0 * * *"
 
 if [ -z "$backup_manuelle_frequenz" ]
 then
@@ -19,7 +17,7 @@ cronedit () {
   echo "$backup_cron_freq flock -n /tmp/backup.lock /home/scripts/backup_script.sh >> /config/logs/backup_script-\$(date +%F).log; cp -rf /config/logs/backup_script-\$(date +%F).log /mnt/sftp/statistik/backup_script-\$(date +%F).log; umount -lf /mnt/sftp/">>cron.temp
   crontab cron.temp
   rm -f cron.temp
-  echo Crontab aktualisiert. Starte crond.
+  echo "Crontab aktualisiert. Starte crond."
   crond -b
 }
 
