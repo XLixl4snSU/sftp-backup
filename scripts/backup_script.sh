@@ -1,8 +1,6 @@
-#!/bin/sh
-# DO NOT MODIFY THIS LINE 5M7AnOtp5R8XZlcgkQrSntFgW6gXgm7M
+#!/bin/bash
 
 # Editable Variables:
-
 sftp_backup_folder="/mnt/sftp/backup/"
 sftp_folder="/mnt/sftp/"
 stat_folder="/mnt/sftp/statistik/"
@@ -11,7 +9,10 @@ logs_folder="/config/logs/"
 lock_delay=60
 default_retention_number=7
 default_bwlimit=4M
-alias d='date "+%F %T"'
+
+d () {
+date "+%F %T"
+}
 
 echo $(d)": Starte Backup-Script..."
 
@@ -47,6 +48,7 @@ do
 done
 
 # Prüfe per Grep ob bereits Backup-Ordner im Format vorhanden sind.
+# Wenn vorhanden, inkrimentelles Backup
 if ls $dest_folder | grep -qE '[0-9]{4}-[0-9]{2}-[0-9]{2}'
 then
   days=0
@@ -72,25 +74,28 @@ then
   then
     echo $(d)": Inkrementelles Backup erfolgreich beendet. Kopiere Logdatei auf Server..."
   else
-    echo $(d)": Fehler! rsync meldet Fehler! Siehe rsync-Logs für weitere Informationen!"
+    echo $(d)": Fehler! rsync meldet Fehler! Logs:"
+	cat $logs_folder"rsync-"$heute".log"
 	echo $(d)": Lösche fehlerhaftes Backup!"
 	rm -rf $dest_folder$heute
 	cp -rf $logs_folder"rsync-"$heute".log" $stat_folder"rsync-"$heute".log"
 	exit 0
    fi
 
+# Initiales Backup
 else
   heute=$(date +%F)
   mkdir -p $dest_folder$heute
   echo $(d)": Es existiert noch kein Backup. Erstelle initiales Backup. Logs unter "$logs_folder"rsync-"$heute".log"
   rsync -avq --no-perms --delete --timeout=30 --stats --log-file $logs_folder"rsync-"$heute".log" --bwlimit $backup_bwlimit $sftp_backup_folder $dest_folder$heute
   rsync_result=$?
-  if [ "$size_dest" -eq "$size_origin" ]
   echo $(d)": rsync beendet. Prüfe Backup..."
+  if [ "$rsync_result" -eq "0" ]
   then
     echo $(d)": Initiales Backup beendet. Kopiere Logdatei auf Server..."
   else
-    echo $(d)": Fehler! rsync meldet Fehler! Siehe rsync-Logs für weitere Informationen!"
+    echo $(d)": Fehler! rsync meldet Fehler! Logs:"
+	cat $logs_folder"rsync-"$heute".log"
 	echo $(d)": Lösche fehlerhaftes Backup und beende Script!"
 	rm -rf $dest_folder$heute
 	cp -rf $logs_folder"rsync-"$heute".log" $stat_folder"rsync-"$heute".log"

@@ -1,7 +1,4 @@
-#!/bin/sh
-# DO NOT MODIFY THIS LINE 5M7AnOtp5R8XZlcgkQrSntFgW6gXgm7M
-
-# Editable Variables:
+#!/bin/bash
 
 if [ -z "$TZ" ]
 then
@@ -18,6 +15,6 @@ then
   exit 0
 else
   echo "Selfcheck erfolgreich. Container läuft."
-  /bin/sh
+  /bin/bash
   sleep infinity
 fi
