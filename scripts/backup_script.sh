@@ -30,7 +30,7 @@ fi
 echo $(d)": Verwende Bandbreitenlimit: $backup_bwlimit"
 echo $(d)": Binde SFTP-Verzeichnis ein."
 set -x
-sshfs -d -p $backup_port -o BatchMode=yes,IdentityFile=/home/ssh/ssh_host_rsa_key,StrictHostKeyChecking=accept-new,_netdev,reconnect,ServerAliveInterval=15,ServerAliveCountMax=3,ConnectTimeout=20 $backup_nutzername@$backup_adresse:/ $sftp_folder
+sshfs -v -p $backup_port -o BatchMode=yes,IdentityFile=/home/ssh/ssh_host_rsa_key,StrictHostKeyChecking=accept-new,_netdev,reconnect,ServerAliveInterval=15,ServerAliveCountMax=3,ConnectTimeout=20 $backup_nutzername@$backup_adresse:/ $sftp_folder
 set +x
 if [ ! -d "$sftp_backup_folder" ]
 then
