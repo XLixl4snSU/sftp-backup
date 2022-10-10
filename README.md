@@ -96,7 +96,7 @@ Die Ausführung des Backups erfolgt einmal täglich mittels cron. Ein Lockfile s
 - **Achtung:** im Rahmen des Backup-Scripts werden alle fremden Ordner im gewählten Backup-Verzeichnis im Format `YYYY-MM-DD` bzw. präziser der regex `\d\d\d\d-\d\d-\d\d` gelöscht. Einzelne Dateien oder Ordner die nicht dem Regex-Format entsprechen werden **nicht** gelöscht oder verändert.
 - Das Script prüft nach Ausführung eines Backups ob mehr als die in `backup_retention_number` definierten Backups vorhanden sind. Wenn ja, wird das jeweils **älteste** Backup gelöscht.
 - Existiert bereits vor der Nutzung ein volles Backup, kann dieses einfach in einen Ordner mit dem aktuellen Datum im Format `YYYY-MM-DD` verschoben werden. Es dient dann als Basis für zukünftige Backups.
-- Backups, die am Ende des Rsync-Vorgangs nicht **exakt** in Größe dem Ursprung entsprechen werden zur Vermeidung korrupter Backups gelöscht. Ein Backup muss dann erneut erfolgen, bspw. am nächsten Tag oder manuell
+- Meldet rsync einen Fehler beim Backup, wird die angelegte Kopie zur Wahrung der Integrität und Korrektheit gelöscht. Es muss dann ein erneutes Backup erfolgen (manuell oder automatisch). 
 - Es kann durch die Ausführung von `./backup-now` im Root-Verzeichnis jederzeit ein sofortiges Backup angestoßen werden.
 
 Dieser Container **speichert Logdateien** im Ordner /config/logs: Diese sind aktuell bei Bedarf manuell zu löschen.
