@@ -81,3 +81,12 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Docker Hub Description
+        id: description
+        uses: peter-evans/dockerhub-description@v3
+        with:
+          username: butti
+          password: ${{ secrets.DOCKER_PW }}
+          repository: ${{ env.IMAGE_NAME }}
+          short-description: ${{ github.event.repository.description }}
