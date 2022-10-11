@@ -1,9 +1,9 @@
 
-![](https://img.shields.io/github/workflow/status/XLixl4snSU/sftp-backup/Docker?style=for-the-badge)
-![](https://img.shields.io/github/release-date/XLixl4snSU/sftp-backup?style=for-the-badge)
-![](https://img.shields.io/docker/v/butti/sftp-backup/latest?style=for-the-badge)
-![](https://img.shields.io/docker/image-size/butti/sftp-backup/latest?style=for-the-badge)
-![](https://img.shields.io/docker/pulls/butti/sftp-backup?style=for-the-badge)
+![](https://img.shields.io/github/workflow/status/XLixl4snSU/sftp-backup/Docker?style=flat-square)
+![](https://img.shields.io/github/release-date/XLixl4snSU/sftp-backup?style=flat-square)
+![](https://img.shields.io/docker/v/butti/sftp-backup/latest?style=flat-square)
+![](https://img.shields.io/docker/image-size/butti/sftp-backup/latest?style=flat-square)
+![](https://img.shields.io/docker/pulls/butti/sftp-backup?style=flat-square)
 
  <br>
  <a href="https://github.com/XLixl4snSU/sftp-backup"><img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Logo.png" height="40"></a>    &nbsp;&nbsp;&nbsp;   <a href="https://hub.docker.com/r/butti/sftp-backup"><img src="https://www.docker.com/wp-content/uploads/2022/03/horizontal-logo-monochromatic-white.png" height="40" ></a>
