@@ -1,14 +1,14 @@
 
+![](https://img.shields.io/github/workflow/status/XLixl4snSU/sftp-backup/Docker?style=flat-square)
+![](https://img.shields.io/github/release-date/XLixl4snSU/sftp-backup?style=flat-square)
+![](https://img.shields.io/docker/v/butti/sftp-backup/latest?style=flat-square)
+![](https://img.shields.io/docker/image-size/butti/sftp-backup/latest?style=flat-square)
+![](https://img.shields.io/docker/pulls/butti/sftp-backup?style=flat-square)
 
-
-![](https://img.shields.io/github/workflow/status/XLixl4snSU/sftp-backup/Docker?style=for-the-badge)
-![](https://img.shields.io/github/release-date/XLixl4snSU/sftp-backup?style=for-the-badge)
-![](https://img.shields.io/docker/v/butti/sftp-backup/latest?style=for-the-badge)
-![](https://img.shields.io/docker/image-size/butti/sftp-backup/latest?style=for-the-badge)
-![](https://img.shields.io/docker/pulls/butti/sftp-backup?style=for-the-badge)
-# sftp-backup - Backup Script
-**If you don't know what this project is, you won't need it.**
-
+ <br>
+ <a href="https://github.com/XLixl4snSU/sftp-backup"><img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Logo.png" height="40"></a>    &nbsp;&nbsp;&nbsp;   <a href="https://hub.docker.com/r/butti/sftp-backup"><img src="https://www.docker.com/wp-content/uploads/2022/03/horizontal-logo-monochromatic-white.png" height="40" ></a>
+ <br><br>
+ 
 ## Überblick
 - [Features](#Features)
 - [Installation und Setup](#Installation-und-Setup)
@@ -93,10 +93,10 @@ Die Ausführung des Backups erfolgt einmal täglich mittels cron. Ein Lockfile s
 - Die Backups befinden sich in Ordnern des Formats `YYYY-MM-DD`
 - Ist noch kein Ordner im Format vorhanden, erfolgt ein erstes Voll-Backup. Alle nachfolgenden Backups verwenden stets Hardlinks mit Basis des jeweils letzten Backups zur Sicherung
 - Es kann jederzeit jede Backup-Version unabhängig von allen anderen Backups gelöscht werden, dies hat keinen Effekt auf andere Backup-Versionen.
-- **Achtung:** im Rahmen des Backup-Scripts werden alle fremden Ordner im gewählten Backup-Verzeichnis im Format `YYYY-MM-DD` bzw. präziser der regex `\d\d\d\d-\d\d-\d\d` gelöscht. Einzelne Dateien oder Ordner die nicht dem Regex-Format entsprechen werden **nicht** gelöscht oder verändert.
+- **Achtung:** im Rahmen des Backup-Scripts werden alle fremden Ordner im gewählten Backup-Verzeichnis im Format `YYYY-MM-DD` bzw. präziser der regex `\d{4}-\d{2}-\d{2}$` gelöscht. Einzelne Dateien oder Ordner die nicht dem Regex-Format entsprechen werden **nicht** gelöscht oder verändert.
 - Das Script prüft nach Ausführung eines Backups ob mehr als die in `backup_retention_number` definierten Backups vorhanden sind. Wenn ja, wird das jeweils **älteste** Backup gelöscht.
 - Existiert bereits vor der Nutzung ein volles Backup, kann dieses einfach in einen Ordner mit dem aktuellen Datum im Format `YYYY-MM-DD` verschoben werden. Es dient dann als Basis für zukünftige Backups.
-- Backups, die am Ende des Rsync-Vorgangs nicht **exakt** in Größe dem Ursprung entsprechen werden zur Vermeidung korrupter Backups gelöscht. Ein Backup muss dann erneut erfolgen, bspw. am nächsten Tag oder manuell
+- Meldet rsync einen Fehler beim Backup, wird die angelegte Kopie zur Wahrung der Integrität und Korrektheit gelöscht. Es muss dann ein erneutes Backup erfolgen (manuell oder automatisch). 
 - Es kann durch die Ausführung von `./backup-now` im Root-Verzeichnis jederzeit ein sofortiges Backup angestoßen werden.
 
 Dieser Container **speichert Logdateien** im Ordner /config/logs: Diese sind aktuell bei Bedarf manuell zu löschen.

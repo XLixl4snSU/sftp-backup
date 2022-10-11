@@ -131,7 +131,7 @@ to_delete=$(find $dest_folder -type d -mindepth 1 $do_not_delete)
 if [ -n "$to_delete" ]
 then
   echo $(d)": Lösche alle anderen Ordner (behalte letzte $backup_retention_number Sicherungen): $to_delete"
-  find $dest_folder -regex ".*/\d\d\d\d-\d\d-\d\d" -type d -mindepth 1 $do_not_delete -exec rm -r {} +
+  find $dest_folder -regex "^.*/\d\{4\}-\d\{2\}-\d\{2\}$" -type d -mindepth 1 $do_not_delete -exec rm -r {} +
 else
   echo $(d)": Es müssen keine alten Backups gelöscht werden ($found von $backup_retention_number (Retention) Sicherungen vorhanden)."
 fi

@@ -7,7 +7,7 @@ name: Docker-dev-Build
 
 on:
   push:
-    branches: [ "dev" ]
+    #branches: [ "dev" ]
     # Publish tags as releases.
     tags: [ 'dev' ]
   workflow_dispatch:
