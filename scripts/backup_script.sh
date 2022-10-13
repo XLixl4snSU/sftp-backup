@@ -138,3 +138,5 @@ fi
 
 echo $(d)": Größe der Backup-Verzeichnisse: " $(du -sh $dest_folder) "(gesamt) Einzeln: "$(du -sh $dest_folder*)
 echo $(d)": Backup-Script beendet."
+rsync -a /config/logs/ /mnt/sftp/statistik/
+umount -lf /mnt/sftp/
