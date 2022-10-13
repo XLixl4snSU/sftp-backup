@@ -39,7 +39,7 @@ then
   exit 0
 fi
 
-rsync -a $logs_folder $stat_folder
+rsync -aq $logs_folder $stat_folder
 
 while [ -f "$sftp_backup_folder"file.lock"" ]
 do
@@ -136,7 +136,8 @@ else
   echo $(d)": Es müssen keine alten Backups gelöscht werden ($found von $backup_retention_number (Retention) Sicherungen vorhanden)."
 fi
 
-echo $(d)": Größe der Backup-Verzeichnisse: " $(du -sh $dest_folder) "(gesamt) Einzeln: "$(du -sh $dest_folder*)
+echo $(d)": Größe der Backup-Verzeichnisse: " $(du -sh $dest_folder) "(gesamt) Einzeln:"
+du -sh $dest_folder*
 echo $(d)": Backup-Script beendet."
-rsync -a /config/logs/ /mnt/sftp/statistik/
+rsync -aq /config/logs/ /mnt/sftp/statistik/
 umount -lf /mnt/sftp/
