@@ -10,10 +10,13 @@ lock_delay=60
 default_retention_number=7
 default_bwlimit=4M
 
+date_today=$(date "+%d.%m.%Y %T")
+
 d () {
-date "+%F %T"
+date "+%d.%m.%Y %T"
 }
 
+echo "------ Start Backup-Log vom $date_today ------"
 echo $(d)": Starte Backup-Script..."
 
 # Setze Standardwerte falls keine ENV durch Nutzer gesetzt wird
@@ -127,7 +130,7 @@ done
 echo $(d)": Folgende Backups werden behalten: $list"
 # Alle anderen Ordner löschen
 
-to_delete=$(find $dest_folder -type d -mindepth 1 $do_not_delete)
+to_delete=$(find $dest_folder -mindepth 1 -type d $do_not_delete)
 if [ -n "$to_delete" ]
 then
   echo $(d)": Lösche alle anderen Ordner (behalte letzte $backup_retention_number Sicherungen): $to_delete"
@@ -141,3 +144,4 @@ du -sh $dest_folder*
 echo $(d)": Backup-Script beendet."
 rsync -r /config/logs/ /mnt/sftp/statistik/
 umount -lf /mnt/sftp/
+echo "------ Ende Backup-Log vom $date_today  ------"

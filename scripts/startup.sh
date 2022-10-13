@@ -8,6 +8,7 @@ fi
 cd /home/scripts
 . ./selfcheck.sh
 . ./cron_update.sh
+echo "------ Start des laufenden Logs ------"> /var/log/container.log
 
 if [ $selfcheck_fail -eq 1 ]
 then
@@ -15,6 +16,5 @@ then
   exit 0
 else
   echo "Selfcheck erfolgreich. Container läuft."
-  /bin/bash
-  sleep infinity
+  tail -f --follow=name /var/log/container.log
 fi
