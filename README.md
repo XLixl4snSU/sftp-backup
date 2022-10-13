@@ -52,7 +52,7 @@ Die notwendigen [Variablen und Volumen](#Variablen-und-Volumen) müssen vor Star
 
 Beispiel:
 
-    docker run --privileged --name sftp-backup -e "backup_port=2025" -e "backup_nutzername=ichbineinnutzer" -e "backup_adresse=sftp.domain.com" -v "/home/sftp-data/config:/config" -v "/home/sftp-data/lokal:/mnt/lokal/" -v "/home/sftp-data/sftp:/mnt/sftp" -d butti/sftp-backup:latest
+    docker run --privileged --name sftp-backup -e "backup_port=2025" -e "backup_nutzername=ichbineinnutzer" -e "backup_adresse=sftp.domain.com" -v "/home/sftp-data/config:/config" -v "/home/sftp-data/lokal:/mnt/lokal/" -d butti/sftp-backup:latest
     
 
 Nach dem ersten Start des Containers werden standardmäßig **SSH-Keys** erzeugt. Diese befinden sich anschließend im eingebundenen Config-Ordner.
