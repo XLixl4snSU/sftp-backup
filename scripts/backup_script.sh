@@ -39,7 +39,7 @@ then
   exit 0
 fi
 
-rsync -aq $logs_folder $stat_folder
+rsync -r $logs_folder $stat_folder
 
 while [ -f "$sftp_backup_folder"file.lock"" ]
 do
@@ -139,5 +139,5 @@ fi
 echo $(d)": Größe der Backup-Verzeichnisse: " $(du -sh $dest_folder) "(gesamt) Einzeln:"
 du -sh $dest_folder*
 echo $(d)": Backup-Script beendet."
-rsync -aq /config/logs/ /mnt/sftp/statistik/
+rsync -r /config/logs/ /mnt/sftp/statistik/
 umount -lf /mnt/sftp/
