@@ -39,7 +39,7 @@ then
   exit 0
 fi
 
-cp -rf $logs_folder* $stat_folder
+rsync -a $logs_folder $stat_folder
 
 while [ -f "$sftp_backup_folder"file.lock"" ]
 do
@@ -131,7 +131,7 @@ to_delete=$(find $dest_folder -type d -mindepth 1 $do_not_delete)
 if [ -n "$to_delete" ]
 then
   echo $(d)": Lösche alle anderen Ordner (behalte letzte $backup_retention_number Sicherungen): $to_delete"
-  find $dest_folder -regex "^.*/\d\{4\}-\d\{2\}-\d\{2\}$" -type d -mindepth 1 $do_not_delete -exec rm -r {} +
+  find $dest_folder -mindepth 1 -type d -regextype "egrep" -regex "^.*/[[:digit:]]{4}-[[:digit:]]{2}-[[:digit:]]{2}$" $do_not_delete -exec rm -r {} +
 else
   echo $(d)": Es müssen keine alten Backups gelöscht werden ($found von $backup_retention_number (Retention) Sicherungen vorhanden)."
 fi

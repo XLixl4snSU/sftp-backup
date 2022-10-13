@@ -1,4 +1,5 @@
 
+
 ![](https://img.shields.io/github/workflow/status/XLixl4snSU/sftp-backup/Docker?style=flat-square)
 ![](https://img.shields.io/github/release-date/XLixl4snSU/sftp-backup?style=flat-square)
 ![](https://img.shields.io/docker/v/butti/sftp-backup/latest?style=flat-square)
@@ -48,6 +49,11 @@ Release laden, entpacken und im Rootverzeichnis Kommando ausführen (erfordert d
 Der Container muss **privilegiert** (privileged) gestartet werden!
 
 Die notwendigen [Variablen und Volumen](#Variablen-und-Volumen) müssen vor Start eingerichtet werden.
+
+Beispiel:
+
+    docker run --privileged --name sftp-backup -e "backup_port=2025" -e "backup_nutzername=ichbineinnutzer" -e "backup_adresse=sftp.domain.com" -v "/home/sftp-data/config:/config" -v "/home/sftp-data/lokal:/mnt/lokal/" -v "/home/sftp-data/sftp:/mnt/sftp" -d butti/sftp-backup:latest
+    
 
 Nach dem ersten Start des Containers werden standardmäßig **SSH-Keys** erzeugt. Diese befinden sich anschließend im eingebundenen Config-Ordner.
 Es können auch **eigene RSA-SSH-Keys** verwendet werden, welche sich vor Start des Containers im Config-Ordner befinden, diese müssen "private_key" sowie "public_key" heißen.
@@ -100,3 +106,4 @@ Die Ausführung des Backups erfolgt einmal täglich mittels cron. Ein Lockfile s
 - Es kann durch die Ausführung von `./backup-now` im Root-Verzeichnis jederzeit ein sofortiges Backup angestoßen werden.
 
 Dieser Container **speichert Logdateien** im Ordner /config/logs: Diese sind aktuell bei Bedarf manuell zu löschen.
+
