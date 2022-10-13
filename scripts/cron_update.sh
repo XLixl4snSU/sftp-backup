@@ -14,7 +14,7 @@ fi
 cronedit () {
   crontab -l > cron.temp
   sed -i '/\/home\/scripts\/backup_script.sh/d' cron.temp
-  echo "$backup_cron_freq flock -n /tmp/backup.lock /home/scripts/backup_script.sh >> /config/logs/backup_script-\$(date +%F).log 2>&1; rsync -a /config/logs/ /mnt/sftp/statistik/; umount -lf /mnt/sftp/">>cron.temp
+  echo "$backup_cron_freq flock -n /tmp/backup.lock /home/scripts/backup_script.sh >> /config/logs/backup_script-\$(date +%F).log 2>&1">>cron.temp
   crontab cron.temp
   rm -f cron.temp
   echo "Crontab aktualisiert. Starte crond."
