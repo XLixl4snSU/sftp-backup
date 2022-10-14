@@ -13,6 +13,7 @@ fi
 
 cronedit () {
   crontab -l > cron.temp
+  grep -q "SHELL=/bin/bash"||sed -i '1i SHELL=/bin/bash' cron.temp
   sed -i '/\/home\/scripts\/backup_script.sh/d' cron.temp
   echo "$backup_cron_freq flock -n /tmp/backup.lock /home/scripts/backup_script.sh |& tee -a /config/logs/backup_script-\$(date +%F).log /var/log/container.log ">>cron.temp
   crontab cron.temp
