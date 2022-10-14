@@ -10,7 +10,7 @@ lock_delay=60
 default_retention_number=7
 default_bwlimit=4M
 
-date_today=$(date "+%d.%m.%Y %T")
+date_today=$(date "+%d.%m.%Y")
 
 d () {
 date "+%d.%m.%Y %T"
@@ -145,3 +145,4 @@ echo $(d)": Backup-Script beendet."
 rsync -r /config/logs/ /mnt/sftp/statistik/
 umount -lf /mnt/sftp/
 echo "------ Ende Backup-Log vom $date_today  ------"
+echo
