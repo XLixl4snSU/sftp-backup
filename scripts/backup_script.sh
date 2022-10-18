@@ -34,14 +34,15 @@ sync_logs () {
   rsync -r $logs_folder $stat_folder
 }
 
-ende () {
-  echo "------ Ende Backup-Log vom $date_today  ------"
+end () {
+  echo "------------ Ende Backup-Log vom $date_today ------------"
+  echo
   sync_logs
   umount -lf /mnt/sftp/
   exit 0
 }
 
-echo "------ Start Backup-Log vom $date_today ------"
+echo "------------ Start Backup-Log vom $date_today ------------"
 echo $(d)": Starte Backup-Script..."
 echo $(d)": Verwende Bandbreitenlimit: $backup_bwlimit"
 echo $(d)": Binde SFTP-Verzeichnis ein."
@@ -56,13 +57,13 @@ then
   then
     echo $(d)": Die SFTP-Verbindung wurde erfolgreich aufgebaut, der Ordner \"backup/\" aber nicht gefunden! Dieser ist notwendig!"
     echo $(d)": Bitte prüfen und erneut versuchen! Breche ab."
-    ende
+    end
   else
     echo $(d)": SFTP-Verzeichnis erfolgreich eingebunden."
   fi
 else
   echo $(d)": Fehler bei der SFTP-Verbindung! Ordner konnte nicht eingebunden werden. Breche ab."
-  ende
+  end
 fi
 
 sync_logs
@@ -124,7 +125,7 @@ else
 	cat $logs_folder"rsync-"$heute".log"
 	echo $(d)": Lösche fehlerhaftes Backup und beende Script!"
 	rm -rf $dest_folder$heute
-	ende
+	end
    fi
 fi
 
@@ -170,4 +171,4 @@ echo $(d)": Speicherbelegung:"
 df -h $dest_folder
 echo
 echo $(d)": Backup erfolgreich beendet."
-ende
+end
