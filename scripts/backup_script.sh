@@ -1,6 +1,7 @@
 #!/bin/bash
 
-# Editable Variables:
+# Variables:
+
 sftp_backup_folder="/mnt/sftp/backup/"
 sftp_folder="/mnt/sftp/"
 stat_folder="/mnt/sftp/statistik/"
@@ -9,17 +10,10 @@ logs_folder="/config/logs/"
 lock_delay=60
 default_retention_number=7
 default_bwlimit=4M
-
 date_today=$(date "+%d.%m.%Y")
 
-d () {
-date "+%d.%m.%Y %T"
-}
+# Set defaults if necessary
 
-echo "------ Start Backup-Log vom $date_today ------"
-echo $(d)": Starte Backup-Script..."
-
-# Setze Standardwerte falls keine ENV durch Nutzer gesetzt wird
 if [ -z $backup_bwlimit ]
 then
   backup_bwlimit=$default_bwlimit
@@ -30,19 +24,48 @@ then
   backup_retention_number=$default_retention_number
 fi
 
+# Functions:
+
+d () {
+date "+%d.%m.%Y %T"
+}
+
+sync_logs () {
+  rsync -r $logs_folder $stat_folder
+}
+
+ende () {
+  echo "------ Ende Backup-Log vom $date_today  ------"
+  sync_logs
+  umount -lf /mnt/sftp/
+  exit 0
+}
+
+echo "------ Start Backup-Log vom $date_today ------"
+echo $(d)": Starte Backup-Script..."
 echo $(d)": Verwende Bandbreitenlimit: $backup_bwlimit"
 echo $(d)": Binde SFTP-Verzeichnis ein."
+# SFTP:
 set -x
 sshfs -v -p $backup_port -o BatchMode=yes,IdentityFile=/home/ssh/ssh_host_rsa_key,StrictHostKeyChecking=accept-new,_netdev,reconnect,ServerAliveInterval=15,ServerAliveCountMax=3,ConnectTimeout=20 $backup_nutzername@$backup_adresse:/ $sftp_folder
 set +x
-if [ ! -d "$sftp_backup_folder" ]
+# Check Mountpoint:
+if mountpoint -q -- "$sftp_folder"
 then
-  echo $(d)": Fehler bei der SSH-Verbindung! Ordner konnte nicht eingebunden werden. Breche ab."
-  umount -lf $sftp_folder
-  exit 0
+  if [ ! -d "$sftp_backup_folder" ]
+  then
+    echo $(d)": Die SFTP-Verbindung wurde erfolgreich aufgebaut, der Ordner \"backup/\" aber nicht gefunden! Dieser ist notwendig!"
+    echo $(d)": Bitte prüfen und erneut versuchen! Breche ab."
+    ende
+  else
+    echo $(d)": SFTP-Verzeichnis erfolgreich eingebunden."
+  fi
+else
+  echo $(d)": Fehler bei der SFTP-Verbindung! Ordner konnte nicht eingebunden werden. Breche ab."
+  ende
 fi
 
-rsync -r $logs_folder $stat_folder
+sync_logs
 
 while [ -f "$sftp_backup_folder"file.lock"" ]
 do
@@ -101,13 +124,12 @@ else
 	cat $logs_folder"rsync-"$heute".log"
 	echo $(d)": Lösche fehlerhaftes Backup und beende Script!"
 	rm -rf $dest_folder$heute
-	cp -rf $logs_folder"rsync-"$heute".log" $stat_folder"rsync-"$heute".log"
-	exit 0
+	ende
    fi
 fi
 
-# Kopiere Logs
-cp -rf $logs_folder"rsync-"$heute".log" $stat_folder"rsync-"$heute".log"
+# Sync Logs
+sync_logs
 
 # Alte Backups löschen
 list=""
@@ -139,10 +161,13 @@ else
   echo $(d)": Es müssen keine alten Backups gelöscht werden ($found von $backup_retention_number (Retention) Sicherungen vorhanden)."
 fi
 
-echo $(d)": Größe der Backup-Verzeichnisse: " $(du -sh $dest_folder) "(gesamt) Einzeln:"
-du -sh $dest_folder*
-echo $(d)": Backup-Script beendet."
-rsync -r /config/logs/ /mnt/sftp/statistik/
-umount -lf /mnt/sftp/
-echo "------ Ende Backup-Log vom $date_today  ------"
+echo $(d)": Größe des Backup-Verzeichnisses: " $(du -sh $dest_folder)
 echo
+echo $(d)": Einzelne Ordner:"
+du -sh $dest_folder*
+echo
+echo $(d)": Speicherbelegung:"
+df -h $dest_folder
+echo
+echo $(d)": Backup erfolgreich beendet."
+ende
