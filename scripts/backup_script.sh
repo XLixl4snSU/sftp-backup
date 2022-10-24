@@ -5,7 +5,7 @@
 sftp_backup_folder="/mnt/sftp/backup/"
 sftp_folder="/mnt/sftp/"
 stat_folder="/mnt/sftp/statistik/"
-dest_folder="/mnt/lokal/"
+dest_folder="/mnt/local/"
 logs_folder="/config/logs/"
 lock_delay=60
 default_retention_number=7
@@ -47,34 +47,34 @@ sync_logs () {
 }
 
 end () {
-  echo "------------ Ende Backup-Log vom $date_today ------------"
+  echo "------------ End of backup log $date_today ------------"
   echo
   sync_logs
   umount -lf /mnt/sftp/
   exit 0
 }
 
-echo "------------ Start Backup-Log vom $date_today ------------"
-info "Starte Backup-Script..."
-info "Verwende Bandbreitenlimit: $backup_bwlimit"
-info "Binde SFTP-Verzeichnis ein."
+echo "------------ Start backup log $date_today ------------"
+info "Starting Backup-Script..."
+info "Using bandwith limit: $backup_bwlimit"
+info "Mounting SFTP folder."
 # SFTP:
 set -x
-sshfs -v -p $backup_port -o BatchMode=yes,IdentityFile=/home/ssh/ssh_host_rsa_key,StrictHostKeyChecking=accept-new,_netdev,reconnect,ServerAliveInterval=15,ServerAliveCountMax=3,ConnectTimeout=20 $backup_nutzername@$backup_adresse:/ $sftp_folder
+sshfs -v -p $backup_port -o BatchMode=yes,IdentityFile=/home/ssh/ssh_host_rsa_key,StrictHostKeyChecking=accept-new,_netdev,reconnect,ServerAliveInterval=15,ServerAliveCountMax=3,ConnectTimeout=20 $backup_user@$backup_address:/ $sftp_folder
 set +x
 # Check Mountpoint:
 if mountpoint -q -- "$sftp_folder"
 then
   if [ ! -d "$sftp_backup_folder" ]
   then
-    error "Die SFTP-Verbindung wurde erfolgreich aufgebaut, der Ordner \"backup/\" aber nicht gefunden! Dieser ist notwendig!"
-    error "Bitte prüfen und erneut versuchen! Breche ab."
+    error "Sucessfully connted via SFTP, but mandatory folder \"backup/\" is missing!"
+    error "Please check and try again."
     end
   else
-    ok "SFTP-Verzeichnis erfolgreich eingebunden."
+    ok "Sucessfully mounted SFTP folder."
   fi
 else
-  error "Fehler bei der SFTP-Verbindung! Ordner konnte nicht eingebunden werden. Breche ab."
+  error "Error connection via SFTP. Folder could not be mounted. Aborting..."
   end
 fi
 
@@ -82,12 +82,11 @@ sync_logs
 
 while [ -f "$sftp_backup_folder"file.lock"" ]
 do
-  warn "Lock-Datei erkannt. Prüfe erneut in $lock_delay Sekunden."
+  warn "Lockfile detected. Checking again in $lock_delay seconds."
   sleep $lock_delay
 done
 
-# Prüfe per Grep ob bereits Backup-Ordner im Format vorhanden sind.
-# Wenn vorhanden, inkrimentelles Backup
+# Use grep to check for existing Backups
 if ls $dest_folder | grep -qE '[0-9]{4}-[0-9]{2}-[0-9]{2}'
 then
   days=0
@@ -97,46 +96,45 @@ then
     date=$(date --date "$days day ago" +%F)
     if [ -d $dest_folder$date ]
     then
-      info "Es existiert bereits ein Backup von $date. Inkrementelles Backup wird erstellt."
+      info "There is already a backup from $date. Creating incremental backup."
       last_backup=$date
       match="true"
     else
       days=$(($days+1))
     fi
   done
-  heute=$(date +%F)
-  mkdir -p $dest_folder$heute
-  rsync -avq --no-perms --delete --timeout=30 --stats --log-file $logs_folder"rsync-"$heute".log" --bwlimit $backup_bwlimit --link-dest=$dest_folder$last_backup/ $sftp_backup_folder $dest_folder$heute
+  today=$(date +%F)
+  mkdir -p $dest_folder$today
+  rsync -avq --no-perms --delete --timeout=30 --stats --log-file $logs_folder"rsync-"$today".log" --bwlimit $backup_bwlimit --link-dest=$dest_folder$last_backup/ $sftp_backup_folder $dest_folder$today
   rsync_result=$?
-  info "rsync beendet. Prüfe Backup..."
+  info "rsync finished. Checking result..."
   if [ "$rsync_result" -eq "0" ]
   then
-    ok "Inkrementelles Backup erfolgreich beendet. Kopiere Logdatei auf Server..."
+    ok "Incremental Backup created successfully."
   else
-    error "Fehler! rsync meldet Fehler! Logs:"
-	cat $logs_folder"rsync-"$heute".log"
-	error "Lösche fehlerhaftes Backup! Backup muss dann erneut gestartet werden!"
-	rm -rf $dest_folder$heute
-	cp -rf $logs_folder"rsync-"$heute".log" $stat_folder"rsync-"$heute".log"
+    error "Rsync reports an error. Logs:"
+	cat $logs_folder"rsync-"$today".log"
+	error "Deleting faulty backup."
+	rm -rf $dest_folder$today
 	exit 0
    fi
 
-# Initiales Backup
+# Initial Backup
 else
-  heute=$(date +%F)
-  mkdir -p $dest_folder$heute
-  info "Es existiert noch kein Backup. Erstelle initiales Backup. Logs unter "$logs_folder"rsync-"$heute".log"
-  rsync -avq --no-perms --delete --timeout=30 --stats --log-file $logs_folder"rsync-"$heute".log" --bwlimit $backup_bwlimit $sftp_backup_folder $dest_folder$heute
+  today=$(date +%F)
+  mkdir -p $dest_folder$today
+  info "No existing backup found. Creating initial full backup."
+  rsync -avq --no-perms --delete --timeout=30 --stats --log-file $logs_folder"rsync-"$today".log" --bwlimit $backup_bwlimit $sftp_backup_folder $dest_folder$today
   rsync_result=$?
-  info "rsync beendet. Prüfe Backup..."
+  info "rsync finished. Checking result..."
   if [ "$rsync_result" -eq "0" ]
   then
-    ok "Initiales Backup beendet. Kopiere Logdatei auf Server..."
+    ok "Initial full backup created successfully."
   else
-    error "Fehler! rsync meldet Fehler! Logs:"
-	cat $logs_folder"rsync-"$heute".log"
-	error "Lösche fehlerhaftes Backup! Backup muss dann erneut gestartet werden!"
-	rm -rf $dest_folder$heute
+    error error "Rsync reports an error. Logs:"
+	cat $logs_folder"rsync-"$today".log"
+	error "Deleting faulty backup."
+	rm -rf $dest_folder$today
 	end
    fi
 fi
@@ -144,7 +142,7 @@ fi
 # Sync Logs
 sync_logs
 
-# Alte Backups löschen
+# Delete old backups
 list=""
 do_not_delete=""
 days=0
@@ -152,7 +150,7 @@ found=0
 match="false"
 while [ "$found" -lt "$backup_retention_number" ] && [ $days -le "365" ]
 do
-  # Sammelt alle Ordner die nicht gelöscht werden sollen (abhängig von Retention)
+  # Get all folders that aren't deleted (depending on retention)
   date=$(date --date "$days day ago" +%F)
   if [ -d $dest_folder$date ]
   then 
@@ -162,25 +160,24 @@ do
   fi
   days=$(($days+1))
 done
-info "Folgende Backups werden behalten: $list"
-# Alle anderen Ordner löschen
-
+info "Keeping the following backups: $list"
+# Delete backups out of retention
 to_delete=$(find $dest_folder -mindepth 1 -type d -regextype "egrep" -regex "^.*/[[:digit:]]{4}-[[:digit:]]{2}-[[:digit:]]{2}$" $do_not_delete)
 if [ -n "$to_delete" ]
 then
-  info "Lösche alle anderen Ordner (behalte letzte $backup_retention_number Sicherungen): $to_delete"
+  info "Deleting backups out of retention (keeping last $backup_retention_number backups): $to_delete"
   rm -r $to_delete
 else
-  ok "Es müssen keine alten Backups gelöscht werden ($found von $backup_retention_number (Retention) Sicherungen vorhanden)."
+  ok "No backups need to be deleted. ($found of $backup_retention_number (retention) backups found)."
 fi
 
-info "Größe des Backup-Verzeichnisses: " $(du -sh $dest_folder)
+info "Size of lokal backup folder: " $(du -sh $dest_folder)
 echo
-info "Einzelne Ordner:"
+info "Individual backup folders:"
 du -sh $dest_folder*
 echo
-info "Speicherbelegung:"
+info "Storage usage:"
 df -h $dest_folder
 echo
-ok "Backup erfolgreich beendet."
+ok "Backup script finished successfully."
 end
