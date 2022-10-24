@@ -26,7 +26,7 @@ else
 fi
 echo "Checking SFTP connection..."
 set -x
-sshfs -p $backup_port -o BatchMode=yes,IdentityFile=/home/ssh/ssh_host_rsa_key,StrictHostKeyChecking=accept-new,_netdev,reconnect $backup_nutzername@$backup_adresse:/ /mnt/sftp/
+sshfs -p $backup_port -o BatchMode=yes,IdentityFile=/home/ssh/ssh_host_rsa_key,StrictHostKeyChecking=accept-new,_netdev,reconnect $backup_user@$backup_address:/ /mnt/sftp/
 set +x
 sleep 2
 echo "Checking mounted folders..."
