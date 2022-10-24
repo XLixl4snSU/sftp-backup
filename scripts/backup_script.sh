@@ -169,7 +169,7 @@ to_delete=$(find $dest_folder -mindepth 1 -type d -regextype "egrep" -regex "^.*
 if [ -n "$to_delete" ]
 then
   info "Lösche alle anderen Ordner (behalte letzte $backup_retention_number Sicherungen): $to_delete"
-  rm -r to_delete
+  rm -r $to_delete
 else
   ok "Es müssen keine alten Backups gelöscht werden ($found von $backup_retention_number (Retention) Sicherungen vorhanden)."
 fi
