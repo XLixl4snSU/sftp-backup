@@ -92,7 +92,7 @@ Make sure that the folder `backup/` exists in the root folder of your SFTP-User 
 |backup_port|Zahl (0-65535)|Ja|Port SFTP server|-
 |backup_user|String|Ja|SFTP username|-
 |backup_bwlimit|number and unit|Optional|Bandwith limit during the backup. Always add a unit, e.g. M = Megabyte|4M
-|backup_manual_frequency|See Crontab |Optional|See https://crontab.guru|10 3 * * *
+|backup_frequency|See Crontab |Optional|See https://crontab.guru|10 3 * * *
 |backup_retention_number|int| Optional|Keeps last X (daily) Backups|7
 |TZ|Continent/City|Optional|Timezone (see [Wikipedia](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones))|Europe/Berlin
 
