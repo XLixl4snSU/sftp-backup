@@ -3,26 +3,30 @@
 echo "Starting Selfcheck."
 mkdir /config/logs
 if [ -f "/config/id_rsa.pub" ] && [ -f "/config/id_rsa" ]; then
-    echo "Key already exists. Using this key.."
-	rm -rf /home/ssh/*
-	cp /config/id_rsa /home/ssh/ssh_host_rsa_key
-	cp /config/id_rsa.pub /home/ssh/ssh_host_rsa_key.pub
+  echo "Key already exists. Using this key.."
+  rm -rf /home/ssh/*
+  cp /config/id_rsa /home/ssh/ssh_host_rsa_key
+  cp /config/id_rsa.pub /home/ssh/ssh_host_rsa_key.pub
+  echo "Your Public Key:"
+  echo
+  echo $(cat /config/id_rsa.pub)
+  echo
 else
-    echo "Key wird neu erstellt und kopiert."
-	rm -rf /home/ssh/*
-	rm -rf /config/id_rsa.pub
-	rm -rf /config/id_rsa
-	cd /home/ssh
-	ssh-keygen -t rsa -b 4096 -f ssh_host_rsa_key -q -N "" < /dev/null
-	cp /home/ssh/ssh_host_rsa_key.pub /config/id_rsa.pub
-	cp /home/ssh/ssh_host_rsa_key /config/id_rsa
-	echo "Success. Stopping container. Please use key:"
-	echo "Public Key:"
-	echo
-	echo $(cat /config/id_rsa.pub)
-	echo
-	elfcheck_fail=1
-	exit 0
+  echo "Key wird neu erstellt und kopiert."
+  rm -rf /home/ssh/*
+  rm -rf /config/id_rsa.pub
+  rm -rf /config/id_rsa
+  cd /home/ssh
+  ssh-keygen -t rsa -b 4096 -f ssh_host_rsa_key -q -N "" < /dev/null
+  cp /home/ssh/ssh_host_rsa_key.pub /config/id_rsa.pub
+  cp /home/ssh/ssh_host_rsa_key /config/id_rsa
+  echo "Success. Stopping container. Please use key:"
+  echo "Your Public Key:"
+  echo
+  echo $(cat /config/id_rsa.pub)
+  echo
+  selfcheck_fail=1
+  exit 0
 fi
 echo "Checking SFTP connection..."
 set -x
