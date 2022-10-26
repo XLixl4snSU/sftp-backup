@@ -4,7 +4,7 @@
 
 sftp_backup_folder="/mnt/sftp/backup/"
 sftp_folder="/mnt/sftp/"
-stat_folder="/mnt/sftp/statistik/"
+remote_logs_folder="/mnt/sftp/logs/"
 dest_folder="/mnt/local/"
 logs_folder="/config/logs/"
 lock_delay=60
@@ -43,7 +43,7 @@ date "+%d.%m.%Y %T"
 }
 
 sync_logs () {
-  rsync -r $logs_folder $stat_folder
+  rsync -r $logs_folder $remote_logs_folder
 }
 
 end () {
