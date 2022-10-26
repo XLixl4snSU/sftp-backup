@@ -88,7 +88,7 @@ Make sure that the folder `backup/` exists in the root folder of your SFTP-User 
 ---
 |Variable|Format|Mandatory?|Info|Default value
 |--|--|--|--|--|
-|backup_address|domain.com \| IP|Ja| URL or IP of the SFTP server|-
+|backup_server|domain.com \| IP|Ja| URL or IP of the SFTP server|-
 |backup_port|Zahl (0-65535)|Ja|Port SFTP server|-
 |backup_user|String|Ja|SFTP username|-
 |backup_bwlimit|number and unit|Optional|Bandwith limit during the backup. Always add a unit, e.g. M = Megabyte|4M
