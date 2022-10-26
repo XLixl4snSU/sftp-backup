@@ -60,7 +60,7 @@ info "Using bandwith limit: $backup_bwlimit"
 info "Mounting SFTP folder."
 # SFTP:
 set -x
-sshfs -v -p $backup_port -o BatchMode=yes,IdentityFile=/home/ssh/ssh_host_rsa_key,StrictHostKeyChecking=accept-new,_netdev,reconnect,ServerAliveInterval=15,ServerAliveCountMax=3,ConnectTimeout=20 $backup_user@$backup_address:/ $sftp_folder
+sshfs -v -p $backup_port -o BatchMode=yes,IdentityFile=/home/ssh/ssh_host_rsa_key,StrictHostKeyChecking=accept-new,_netdev,reconnect,ServerAliveInterval=15,ServerAliveCountMax=3,ConnectTimeout=20 $backup_user@$backup_server:/ $sftp_folder
 set +x
 # Check Mountpoint:
 if mountpoint -q -- "$sftp_folder"
