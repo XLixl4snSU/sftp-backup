@@ -43,7 +43,10 @@ date "+%d.%m.%Y %T"
 }
 
 sync_logs () {
-  rsync -r $logs_folder $remote_logs_folder
+  if [ -d "$remote_logs_folder" ]
+  then
+    rsync -r $logs_folder $remote_logs_folder
+  fi
 }
 
 end () {
