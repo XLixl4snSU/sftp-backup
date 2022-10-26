@@ -171,7 +171,7 @@ else
   ok "No backups need to be deleted. ($found of $backup_retention_number (retention) backups found)."
 fi
 
-info "Size of lokal backup folder: " $(du -sh $dest_folder)
+info "Size of lokal backup folder: $(du -sh $dest_folder)"
 echo
 info "Individual backup folders:"
 du -sh $dest_folder*
