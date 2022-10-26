@@ -76,7 +76,8 @@ You now have to use this public key and add it as a authentication method on you
 The container will **always stop** after start if the startup script can't successfully establish a connection to the SFTP-Server.
 If you haven't provided keys beforehand it is therefore expected for the container to stop after the first start. Just start it again once your SFTP-Server is configured to use the public key.
 
-Make sure that the folder `backup/` exists in the root folder of your SFTP-User (see [requirements](#requirements)).
+Make sure that the folder `backup` exists in the root folder of your SFTP-User (see [requirements](#requirements)).
+If you want to get the logs that are created by the backup script on your SFTP-Server, you can create a folder `logs` in your SFTP-Users root directory. Logs will be synced to this location before and after each backup.
 
 
 ## Environment variables and volumes
@@ -96,7 +97,7 @@ Make sure that the folder `backup/` exists in the root folder of your SFTP-User 
 |backup_retention_number|int| Optional|Keeps last X (daily) Backups|7
 |TZ|Continent/City|Optional|Timezone (see [Wikipedia](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones))|Europe/Berlin
 
-Mandatory variables have to be declared, otherwise the container will stop after a healtcheck.
+Mandatory variables have to be declared, otherwise the container will stop after a healthcheck.
 
 
 ## Running the container
