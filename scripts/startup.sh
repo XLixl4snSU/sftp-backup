@@ -1,21 +1,25 @@
 #!/bin/bash
 
+# Import output library
+. /home/scripts/global_functions.sh
+
 if [ -z "$TZ" ]
 then
   export TZ=Europe/Berlin
 fi
 
 cd /home/scripts
-. ./selfcheck.sh
-. ./cron_update.sh
+./cron_update.sh
+./selfcheck.sh
+selfcheck_status=$?
 echo "------------ Start container log ------------"> /var/log/container.log
 
-if [ $selfcheck_fail -eq 1 ]
+if ( exit $selfcheck_status)
 then
-  echo "Selfcheck failed! Stopping container..."
-  exit 0
-else
-  echo "Selfcheck passed."
+  ok "Selfcheck passed. Container is running."
   echo
   tail -F /var/log/container.log 2> /dev/null
+else
+  error "Stopping container..."
+  exit 0
 fi

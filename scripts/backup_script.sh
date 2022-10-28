@@ -1,43 +1,13 @@
 #!/bin/bash
 
 # Variables:
-
-sftp_backup_folder="/mnt/sftp/backup/"
-sftp_folder="/mnt/sftp/"
-remote_logs_folder="/mnt/sftp/logs/"
-dest_folder="/mnt/local/"
-logs_folder="/config/logs/"
-lock_delay=60
-default_retention_number=7
-default_bwlimit=4M
 date_today=$(date "+%d.%m.%Y")
 
-# Set defaults if necessary
-
-if [ -z $backup_bwlimit ]
-then
-  backup_bwlimit=$default_bwlimit
-fi
-
-if [ -z $backup_retention_number ]
-then
-  backup_retention_number=$default_retention_number
-fi
-
 # Functions:
+# Import Output Functions
 
-info () {
-  echo "[INFO]  $(date "+%T"): $1"
-}
-error () {
-  echo -e "\e[31m[ERROR] $(date "+%T"): $1\e[0m"
-}
-warn () {
-  echo -e "\e[33m[WARN]  $(date "+%T"): $1\e[0m"
-}
-ok () {
-  echo -e "\e[32m[OK]    $(date "+%T"): $1\e[0m"
-}
+. /home/scripts/global_functions.sh
+
 d () {
 date "+%d.%m.%Y %T"
 }
@@ -62,9 +32,7 @@ info "Starting Backup-Script..."
 info "Using bandwith limit: $backup_bwlimit"
 info "Mounting SFTP folder."
 # SFTP:
-set -x
-sshfs -v -p $backup_port -o BatchMode=yes,IdentityFile=/home/ssh/ssh_host_rsa_key,StrictHostKeyChecking=accept-new,_netdev,reconnect,ServerAliveInterval=15,ServerAliveCountMax=3,ConnectTimeout=20 $backup_user@$backup_server:/ $sftp_folder
-set +x
+mount_sftp
 # Check Mountpoint:
 if mountpoint -q -- "$sftp_folder"
 then
