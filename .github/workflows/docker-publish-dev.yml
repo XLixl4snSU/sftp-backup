@@ -11,7 +11,6 @@ on:
     # Publish tags as releases.
     tags: [ 'dev' ]
   workflow_dispatch:
-runs-on: self-hosted
 env:
   # Use docker.io for Docker Hub if empty
   REGISTRY: docker.io
@@ -20,8 +19,8 @@ env:
 
 jobs:
   build:
-
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
+#    runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
