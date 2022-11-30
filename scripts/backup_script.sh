@@ -36,6 +36,7 @@ backup_error() {
 }
 
 echo "------------ Start backup log $date_today ------------"
+info "Using sftp-backup version v$backup_version"
 info "Starting Backup-Script..."
 info "Using bandwith limit: $backup_bwlimit"
 info "Mounting SFTP folder."
