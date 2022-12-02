@@ -70,7 +70,7 @@ When you start the container for the first time, it will create **SSH-Keys** (if
 It is possible to use your own **RSA-SSH-Keys**. They have to be named `id_rsa` (private key) and `id_rsa.pub` (public key). Make sure they are in the correct format, because they won't be checked atm. It is always a good practice to let the container generate them for you. 
 You now have to use this public key and add it as a authentication method on your server. See the documentation of the SFTP-Server you are using on how to do it. It is **not possible** to use a password to authenticate for security reasons.
 
-The container will ** stop** after start if the startup script can't successfully establish a connection to the SFTP-Server after a total of 12 retries in a 5-minute interval (60 minutes after start).
+The container will **stop** after start if the startup script can't successfully establish a connection to the SFTP-Server after a total of 12 retries in a 5-minute interval (60 minutes after start).
 If you haven't provided keys beforehand it is expected for the container to stop after the first start. Just start it again once your SFTP-Server is configured to use the public key.
 
 Make sure that the folder `backup` exists in the root folder of your SFTP-User (see [requirements](#requirements)).
