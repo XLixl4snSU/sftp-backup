@@ -8,10 +8,6 @@ date_today=$(date "+%d.%m.%Y")
 
 . /home/scripts/global_functions.sh
 
-d() {
-    date "+%d.%m.%Y %T"
-}
-
 sync_logs() {
     if [ -d "$remote_logs_folder" ]; then
         rsync -r $logs_folder $remote_logs_folder
@@ -35,8 +31,7 @@ backup_error() {
     end
 }
 
-echo "------------ Start backup log $date_today ------------"
-info "Using sftp-backup version v$backup_version"
+echo "------------ Start backup log $date_today (Using v$backup_version)------------"
 info "Starting Backup-Script..."
 info "Using bandwith limit: $backup_bwlimit"
 info "Mounting SFTP folder."
@@ -117,7 +112,7 @@ while [ "$found" -lt "$backup_retention_number" ] && [ $days -le "365" ]; do
     # Get all folders that aren't deleted (depending on retention)
     date=$(date --date "$days day ago" +%F)
     if [ -d $dest_folder$date ]; then
-        list=$date" "$list
+        list=$(convert_date_to_readable $date)" "$list
         do_not_delete=$do_not_delete"-not -name $date "
         found=$(($found + 1))
     fi
@@ -133,13 +128,16 @@ if [ -n "$to_delete" ]; then
 else
     ok "No backups need to be deleted. ($found of $backup_retention_number (retention) backups found)."
 fi
-
-info "Size of lokal backup folder: $(du -sh $dest_folder)"
 echo
-info "Individual backup folders:"
-du -sh $dest_folder*
+info "Storage Information:"
+echo "Total: $(du -sh $dest_folder | awk '{print $1}'), individual folders:"
 echo
-info "Storage usage:"
+for d in $dest_folder*; do
+    if [ -d "$d" ] && [[ $d =~ ^.*/[[:digit:]]{4}-[[:digit:]]{2}-[[:digit:]]{2}$ ]]; then
+        echo $(convert_date_to_readable $(du -sh $d | awk -F" +|/" '{print $NF}'))": "$(du -sh $d | awk '{print $1}')
+    fi
+done
+echo
 df -h $dest_folder
 echo
 ok "Backup script finished successfully."

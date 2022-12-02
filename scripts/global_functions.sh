@@ -23,6 +23,12 @@ fi
 time_now () {
   date "+%T"
 }
+date_and_time() {
+    date "+%d.%m.%Y %T"
+}
+convert_date_to_readable() {
+  echo $(date -d $1 "+%d.%m.%Y")
+}
 info () {
   echo "[INFO]  $(time_now): $1"
 }
