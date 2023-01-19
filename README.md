@@ -1,4 +1,4 @@
-![](https://img.shields.io/github/workflow/status/XLixl4snSU/sftp-backup/Docker?style=flat-square)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/XLixl4snSU/sftp-backup/docker-publish.yml?style=flat-square)
 ![](https://img.shields.io/github/release-date/XLixl4snSU/sftp-backup?style=flat-square)
 ![](https://img.shields.io/docker/v/butti/sftp-backup/latest?style=flat-square)
 ![](https://img.shields.io/docker/image-size/butti/sftp-backup/latest?style=flat-square)
@@ -87,7 +87,7 @@ If you want to get the logs that are created by the backup script on your SFTP-S
 |Variable|Format|Mandatory?|Info|Default value
 |--|--|--|--|--|
 |backup_server|domain.com \| IP|Yes| URL or IP of the SFTP server|-
-|backup_port|Zahl (0-65535)|Yes|Port SFTP server|-
+|backup_port|number (0-65535)|Yes|Port SFTP server|-
 |backup_user|String|Yes|SFTP username|-
 |backup_bwlimit|number and unit|Optional|Bandwith limit during the backup. Always add a unit, e.g. M = Megabyte|4M
 |backup_frequency|See Crontab |Optional|See https://crontab.guru|10 3 * * *
