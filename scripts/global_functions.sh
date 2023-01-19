@@ -27,8 +27,24 @@ date_and_time() {
     date "+%d.%m.%Y %T"
 }
 convert_date_to_readable() {
-  echo $(date -d $1 "+%d.%m.%Y")
+  string=$1
+  pattern="(.*)([[:digit:]]{4}-[[:digit:]]{2}-[[:digit:]]{2})(.*)"
+  while [[ $string =~ $pattern ]]; do
+    date=$(date -d ${BASH_REMATCH[2]} "+%d.%m.%Y")
+    string=${BASH_REMATCH[1]}$date${BASH_REMATCH[3]}
+  done
+  echo "$string"
 }
+
+remove_path_from_filename() {
+  string="$1"
+  for part in $string; do
+    base=$(basename "$part")
+    string="${string/"$part"/"$base"}"
+  done
+  echo "$string"
+}
+
 info () {
   echo "[INFO]  $(time_now): $1"
 }
@@ -42,7 +58,5 @@ ok () {
   echo -e "\e[32m[OK]    $(time_now): $1\e[0m"
 }
 mount_sftp () {
-  #set -x
   sshfs -v -p $backup_port -o BatchMode=yes,IdentityFile=/home/ssh/id_rsa,StrictHostKeyChecking=accept-new,_netdev,reconnect,ServerAliveInterval=15,ServerAliveCountMax=3,ConnectTimeout=20 $backup_user@$backup_server:/ $sftp_folder
-  #set +x
 }

@@ -130,7 +130,11 @@ else
 fi
 echo
 info "Storage Information:"
-echo "Total: $(du -sh $dest_folder | awk '{print $1}'), individual folders:"
+echo "Total: $(du -sh $dest_folder | awk '{print $1}'), actual size distribution of individual folders:"
+echo
+echo "$(remove_path_from_filename "$(convert_date_to_readable "$(du -sh $dest_folder*)")")"
+echo
+echo "Size of each backup:"
 echo
 for d in $dest_folder*; do
     if [ -d "$d" ] && [[ $d =~ ^.*/[[:digit:]]{4}-[[:digit:]]{2}-[[:digit:]]{2}$ ]]; then
