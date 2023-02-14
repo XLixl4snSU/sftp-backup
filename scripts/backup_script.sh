@@ -16,7 +16,7 @@ sync_logs() {
 
 background_sync() {
     if [ ! "$background_sync_running" = true ]; then
-        background_sync_running = true
+        background_sync_running=true
         while true; do
             sync_logs
             sleep $backup_logsync_intervall
