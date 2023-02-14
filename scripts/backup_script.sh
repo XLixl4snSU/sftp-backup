@@ -20,6 +20,7 @@ background_sync() {
         while true; do
             sync_logs
             sleep $backup_logsync_intervall
+        done
     fi
 }
 
