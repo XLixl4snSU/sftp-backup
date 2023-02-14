@@ -27,6 +27,7 @@ background_sync() {
 end() {
     echo "------------ End of backup log $date_today ------------"
     echo
+    kill $sync_pid
     sync_logs
     umount -lf /mnt/sftp/
     exit 0
@@ -43,7 +44,8 @@ backup_error() {
 
 # ------- Start of Backup --------
 # Start intervall sync of logs
-background_sync
+background_sync &
+sync_pid=$!
 
 echo "------------ Start backup log $date_today (Using v$backup_version)------------"
 info "Starting Backup-Script..."
