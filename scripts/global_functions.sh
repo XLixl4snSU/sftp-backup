@@ -6,19 +6,20 @@ dest_folder="/mnt/local/"
 logs_folder="/config/logs/"
 lock_delay=60
 
-default_retention_number=7
-default_bwlimit=4M
+default_backup_retention_number=7
+default_backup_bwlimit=4M
+default_backup_logsync_intervall=10
 
-# Set default values if not declared
-if [ -z $backup_bwlimit ]
-then
-  export backup_bwlimit=$default_bwlimit
-fi
+set_defaults() {
+  for var in "$@"; do
+    default_key="default_$var"
+    if [ -z "${!var}" ]; then
+      export $var=${!default_key}
+    fi
+  done
+}
 
-if [ -z $backup_retention_number ]
-then
-  export backup_retention_number=$default_retention_number
-fi
+set_defaults backup_retention_number backup_bwlimit backup_logsync_intervall
 
 time_now () {
   date "+%T"

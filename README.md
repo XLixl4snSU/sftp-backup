@@ -1,3 +1,4 @@
+
 ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/XLixl4snSU/sftp-backup/docker-publish.yml?style=flat-square)
 ![](https://img.shields.io/github/release-date/XLixl4snSU/sftp-backup?style=flat-square)
 ![](https://img.shields.io/docker/v/butti/sftp-backup/latest?style=flat-square)
@@ -91,7 +92,8 @@ If you want to get the logs that are created by the backup script on your SFTP-S
 |backup_user|String|Yes|SFTP username|-
 |backup_bwlimit|number and unit|Optional|Bandwith limit during the backup. Always add a unit, e.g. M = Megabyte|4M
 |backup_frequency|See Crontab |Optional|See https://crontab.guru|10 3 * * *
-|backup_retention_number|int| Optional|Keeps last X (daily) Backups|7
+|backup_retention_number|number| Optional|Keeps last X (daily) Backups|7
+|backup_logsync_intervall|number |Optional|Intervall to sync logs to origin server while the backup process is running in seconds.|10s
 |TZ|Continent/City|Optional|Timezone (see [Wikipedia](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones))|Europe/Berlin
 
 Mandatory variables have to be declared, otherwise the container will stop after a healthcheck.

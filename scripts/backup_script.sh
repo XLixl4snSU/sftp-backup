@@ -3,7 +3,7 @@
 # Variables:
 date_today=$(date "+%d.%m.%Y")
 
-# Functions:
+# ------- Helper Functions:--------
 # Import Output Functions
 
 . /home/scripts/global_functions.sh
@@ -14,9 +14,20 @@ sync_logs() {
     fi
 }
 
+background_sync() {
+    if [ ! "$background_sync_running" = true ]; then
+        background_sync_running=true
+        while true; do
+            sync_logs
+            sleep $backup_logsync_intervall
+        done
+    fi
+}
+
 end() {
     echo "------------ End of backup log $date_today ------------"
     echo
+    kill $sync_pid
     sync_logs
     umount -lf /mnt/sftp/
     exit 0
@@ -30,6 +41,11 @@ backup_error() {
     error "Backup unsuccessful!"
     end
 }
+
+# ------- Start of Backup --------
+# Start intervall sync of logs
+background_sync &
+sync_pid=$!
 
 echo "------------ Start backup log $date_today (Using v$backup_version)------------"
 info "Starting Backup-Script..."
