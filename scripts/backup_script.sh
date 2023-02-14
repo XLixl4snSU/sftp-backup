@@ -3,7 +3,7 @@
 # Variables:
 date_today=$(date "+%d.%m.%Y")
 
-# Functions:
+# ------- Helper Functions:--------
 # Import Output Functions
 
 . /home/scripts/global_functions.sh
@@ -11,6 +11,15 @@ date_today=$(date "+%d.%m.%Y")
 sync_logs() {
     if [ -d "$remote_logs_folder" ]; then
         rsync -r $logs_folder $remote_logs_folder
+    fi
+}
+
+background_sync() {
+    if [ ! "$background_sync_running" = true ]; then
+        background_sync_running = true
+        while true; do
+            sync_logs
+            sleep $backup_logsync_intervall
     fi
 }
 
@@ -30,6 +39,10 @@ backup_error() {
     error "Backup unsuccessful!"
     end
 }
+
+# ------- Start of Backup --------
+# Start intervall sync of logs
+background_sync
 
 echo "------------ Start backup log $date_today (Using v$backup_version)------------"
 info "Starting Backup-Script..."
