@@ -46,6 +46,11 @@ remove_path_from_filename() {
   echo "$string"
 }
 
+remove_newlines() {
+  string="$1"
+  echo "${string//$'\n'/ }"
+}
+
 info () {
   echo "[INFO]  $(time_now): $1"
 }
