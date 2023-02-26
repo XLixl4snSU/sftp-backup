@@ -102,7 +102,7 @@ if ls $dest_folder | grep -qE '[0-9]{4}-[0-9]{2}-[0-9]{2}'; then
     today=$(date +%F)
     mkdir -p $dest_folder$today
     touch $dest_folder$today/backup_running.lock
-    rsync -avq --no-perms --delete --timeout=30 --stats --log-file $logs_folder"rsync-"$today".log" --bwlimit $backup_bwlimit --link-dest=$dest_folder$last_backup/ $sftp_backup_folder $dest_folder$today
+    rsync -avq --no-perms --delete --timeout=300 --stats --log-file $logs_folder"rsync-"$today".log" --bwlimit $backup_bwlimit --link-dest=$dest_folder$last_backup/ $sftp_backup_folder $dest_folder$today
     rsync_result=$?
     info "rsync finished. Checking result..."
     if [ "$rsync_result" -eq "0" ]; then
@@ -116,7 +116,7 @@ else
     today=$(date +%F)
     mkdir -p $dest_folder$today
     info "No existing backup found. Creating initial full backup."
-    rsync -avq --no-perms --delete --timeout=30 --stats --log-file $logs_folder"rsync-"$today".log" --bwlimit $backup_bwlimit $sftp_backup_folder $dest_folder$today
+    rsync -avq --no-perms --delete --timeout=300 --stats --log-file $logs_folder"rsync-"$today".log" --bwlimit $backup_bwlimit $sftp_backup_folder $dest_folder$today
     rsync_result=$?
     info "rsync finished. Checking result..."
     if [ "$rsync_result" -eq "0" ]; then
