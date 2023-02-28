@@ -160,7 +160,7 @@ echo
 echo "------------  Storage Information  ------------------"
 echo "Total: $(du -sh $dest_folder | awk '{print $1}'), actual size distribution of individual folders:"
 echo
-echo "$(remove_path_from_filename "$(convert_date_to_readable "$(du -sh $dest_folder*)")")" | awk '{print $2 ": " $1}'
+echo "$(remove_path_from_filename "$(convert_date_to_readable "$(du -sh $dest_folder* | grep -E '[0-9]{4}-[0-9]{2}-[0-9]{2}')")")" | awk '{print $2 ": " $1}'
 echo
 echo "Total size of each backup independently:"
 echo
