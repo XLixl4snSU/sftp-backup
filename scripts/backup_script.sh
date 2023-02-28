@@ -136,7 +136,7 @@ days=0
 found=0
 match="false"
 total_backups="$(find $dest_folder -maxdepth 1 -regextype posix-egrep -regex '.*[[:digit:]]{4}-[[:digit:]]{2}-[[:digit:]]{2}$' | wc -l)"
-while [ "$found" -lt "$backup_retention_number" ] && [ $days -le "$total_backups" ]; do
+while [ "$found" -lt "$backup_retention_number" ] && [ "$found" -le "$total_backups" ]; do
     # Get all folders that aren't deleted (depending on retention)
     date=$(date --date "$days day ago" +%F)
     if [ -d $dest_folder$date ]; then
