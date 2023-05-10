@@ -60,7 +60,7 @@ run_rsync() {
 
 incremental_backup() {
     get_last_backup
-    rsync_flags="-avq --no-perms --delete --timeout=300 --stats --log-file $logs_folder"rsync-"$backup_start_date".log" --bwlimit $backup_bwlimit --link-dest=$dest_folder$last_backup/ $sftp_backup_folder $dest_folder$backup_start_date"
+    rsync_flags="-avq $backup_rsync_custom_flags --no-perms --delete --timeout=300 --stats --log-file $logs_folder"rsync-"$backup_start_date".log" --bwlimit $backup_bwlimit --link-dest=$dest_folder$last_backup/ $sftp_backup_folder $dest_folder$backup_start_date"
     run_rsync
 }
 
@@ -70,7 +70,7 @@ resume_backup() {
 }
 
 initial_backup() {
-    rsync_flags="-avq --no-perms --delete --timeout=300 --stats --log-file $logs_folder"rsync-"$backup_start_date".log" --bwlimit $backup_bwlimit $sftp_backup_folder $dest_folder$backup_start_date"
+    rsync_flags="-avq $backup_rsync_custom_flags --no-perms --delete --stats --log-file $logs_folder"rsync-"$backup_start_date".log" --bwlimit $backup_bwlimit $sftp_backup_folder $dest_folder$backup_start_date"
     run_rsync
 }
 
