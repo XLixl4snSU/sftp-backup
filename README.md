@@ -94,6 +94,7 @@ If you want to get the logs that are created by the backup script on your SFTP-S
 |backup_frequency|See Crontab |Optional|See https://crontab.guru|10 3 * * *
 |backup_retention_number|number| Optional|Keeps last X (daily) Backups|7
 |backup_logsync_intervall|number |Optional|Intervall to sync logs to origin server while the backup process is running in seconds.|10s
+|backup_rsync_custom_flags|string|Optional |Set custom rsync flags, the following are always set: -avq --no-perms --delete --stats|
 |TZ|Continent/City|Optional|Timezone (see [Wikipedia](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones))|Europe/Berlin
 
 Mandatory variables have to be declared, otherwise the container will stop after a healthcheck.
