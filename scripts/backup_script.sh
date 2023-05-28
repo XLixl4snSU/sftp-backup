@@ -8,17 +8,6 @@ date_today=$(date "+%d.%m.%Y")
 
 . /home/scripts/global_functions.sh
 
-trap abort SIGINT
-
-abort() {
-    error "Backup cancelled!"
-    error "Deleting cancelled backup."
-    backup_error
-    delete_backup $backup_start_date
-    error "Backup unsuccessful!"
-    end
-}
-
 sync_logs() {
     if [ -d "$remote_logs_folder" ]; then
         rsync -r $logs_folder $remote_logs_folder
@@ -64,12 +53,34 @@ incremental_backup() {
     run_rsync
 }
 
+get_last_backup() {
+    days=0
+    match="false"
+    while [ "$match" = "false" ]; do
+        date=$(date --date "$search_from_date $days day ago" +%F)
+        if [ -d $dest_folder$date ]; then
+            if [ "$date" = "$backup_start_date" ]; then
+                info "There is already a backup from today. Updating today's backup."
+            else 
+                info "There is already a backup from $date. Creating incremental backup."
+                mkdir -p $dest_folder$backup_start_date
+            fi
+            last_backup=$date
+            match="true"
+        else
+            days=$(($days + 1))
+        fi
+    done
+}
+
 resume_backup() {
     rsync_flags="$(head -2 $dest_folder.running_backup | tail +2)"
+    warn "Rsync flags: $rsync_flags"
     run_rsync
 }
 
 initial_backup() {
+    mkdir -p $dest_folder$backup_start_date
     rsync_flags="-avq $backup_rsync_custom_flags --no-perms --delete --stats --log-file $logs_folder"rsync-"$backup_start_date".log" --bwlimit $backup_bwlimit $sftp_backup_folder $dest_folder$backup_start_date"
     run_rsync
 }
@@ -82,7 +93,7 @@ cleanup_and_storage_info() {
     found=0
     match="false"
     total_backups="$(find $dest_folder -maxdepth 1 -regextype posix-egrep -regex '.*[[:digit:]]{4}-[[:digit:]]{2}-[[:digit:]]{2}$' | wc -l)"
-    while [ "$found" -lt "$backup_retention_number" ] && [ $days -le "$total_backups" ]; do
+    while [ "$found" -lt "$backup_retention_number" ] && [ $found -lt "$total_backups" ]; do
         # Get all folders that aren't deleted (depending on retention)
         date=$(date --date "$days day ago" +%F)
         if [ -d $dest_folder$date ]; then
@@ -121,26 +132,6 @@ cleanup_and_storage_info() {
     ok "Backup script finished successfully."
     end
 }
-
-get_last_backup() {
-    days=0
-    match="false"
-    while [ "$match" = "false" ]; do
-        date=$(date --date "$search_from_date $days day ago" +%F)
-        if [ -d $dest_folder$date ]; then
-            if [ "$date" = "$backup_start_date" ]; then
-                info "There is already a backup from today. Updating today's backup."
-            else 
-                info "There is already a backup from $date. Creating incremental backup."
-            fi
-            last_backup=$date
-            match="true"
-        else
-            days=$(($days + 1))
-        fi
-    done
-}
-
 
 # ------- Start of Backup --------
 # Start intervall sync of logs
@@ -186,15 +177,12 @@ if [ -f "$dest_folder.running_backup" ]; then
     fi
 fi
 
+backup_start_date=$(date +%F)
 # Use grep to check for existing Backups
 if ls $dest_folder | grep -qE '[0-9]{4}-[0-9]{2}-[0-9]{2}'; then
-    backup_start_date=$(date +%F)
-    mkdir -p $dest_folder$backup_start_date
     incremental_backup
     # Initial Backup (if no existing one is found)
 else
-    backup_start_date=$(date +%F)
-    mkdir -p $dest_folder$backup_start_date
     info "No existing backup found. Creating initial full backup."
     initial_backup
 fi
