@@ -9,9 +9,7 @@ date_today=$(date "+%d.%m.%Y")
 . /home/scripts/global_functions.sh
 
 sync_logs() {
-    if [ -d "$remote_logs_folder" ]; then
-        rsync -r $logs_folder $remote_logs_folder
-    fi
+    rsync -e 'ssh -p $backup_port' -r $logs_folder $backup_user@$backup_server:/logs/
 }
 
 background_sync() {
@@ -49,7 +47,7 @@ run_rsync() {
 
 incremental_backup() {
     get_last_backup
-    rsync_flags="-avq $backup_rsync_custom_flags --no-perms --delete --timeout=300 --stats --log-file $logs_folder"rsync-"$backup_start_date".log" --bwlimit $backup_bwlimit --link-dest=$dest_folder$last_backup/ $sftp_backup_folder $dest_folder$backup_start_date"
+    rsync_flags="-avq $backup_rsync_custom_flags --no-perms --delete --timeout=300 --stats --log-file $logs_folder"rsync-"$backup_start_date".log" --bwlimit $backup_bwlimit --link-dest=$dest_folder$last_backup/ -e 'ssh -p $backup_port' $backup_user@$backup_server:/backup/ $dest_folder$backup_start_date"
     run_rsync
 }
 
