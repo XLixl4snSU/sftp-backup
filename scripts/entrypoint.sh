@@ -32,4 +32,4 @@ then
 else
   error "Stopping container..."
   exit 0
-fi
+fi 

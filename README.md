@@ -25,7 +25,7 @@ This project is the base for a docker container that provides the possibility to
 
  - Docker base image: Alpine Linux
  - Very lightweight (<10mb compressed docker image)
- - Backups of files on a remote SFTP-Server on time a day
+ - Backups of files on a remote SFTP-Server with rsync enabled on time a day
  - Rudimentary incremental Backups with a custom retention period in days
  - Authentication by SSH-Keys
  - Easily accessible Logs with extensive information of the process
@@ -33,11 +33,11 @@ This project is the base for a docker container that provides the possibility to
 This project is the base of of Docker container. You can pull the image from DockerHub and GitHub Container Repository, but also build it locally.
 ### Requirements:
  - Docker installed on your host machine. See https://docs.docker.com/engine/install/ for instructions.
- - SFTP-Server that supports authentication via RSA-SSH-Keys (basically all should do)
-	 - folder `backup/` in the users root directory
+ - SFTP-Server that supports authentication via RSA-SSH-Keys (basically all should do) and the rsync command.
+	 - folder `/backup/` in the users root directory (location can be configured with variables)
 		 - this is where you mount the data that you want to back up
 		 - you should configure this folder to be **read-only** by the SFTP-user
-	 - optionally (but highly recommended) folder `logs/` in the users root directory
+	 -  folder `/logs/` in the users root directory (location can be configured with variables)
 		 - this is where logs are saved to from the remote container
 		 - this needs to be configured **read-write**
 
@@ -58,24 +58,19 @@ Download a release, extract it and run the following command in the root folder:
     docker build .
 
 ### First Start
-You have to run the container with the **privileged** flag, otherwise the fuse mount won't work (and therefore also the container).
-
 See [Environment variables and volumes](#Environment-variables-and-volumes) for the flags you need to run the container.
 
 Example:
 
-    docker run --privileged --name sftp-backup -e "backup_port=2025" -e "backup_user=myusername" -e "backup_server=sftp.domain.com" -v "/path/to/local/folder/config:/config" -v "/path/to/local/folder/local:/mnt/local/" -d butti/sftp-backup:latest
+    docker run --name sftp-backup -e "backup_port=2025" -e "backup_user=myusername" -e "backup_server=sftp.domain.com" -v "/path/to/local/folder/config:/config" -v "/path/to/local/folder/local:/mnt/local/" -d butti/sftp-backup:latest
     
 
 When you start the container for the first time, it will create **SSH-Keys** (if they don't already exist). These will be located in your mounted config-folder.
 It is possible to use your own **RSA-SSH-Keys**. They have to be named `id_rsa` (private key) and `id_rsa.pub` (public key). Make sure they are in the correct format, because they won't be checked atm. It is always a good practice to let the container generate them for you. 
 You now have to use this public key and add it as a authentication method on your server. See the documentation of the SFTP-Server you are using on how to do it. It is **not possible** to use a password to authenticate for security reasons.
 
-The container will **stop** after start if the startup script can't successfully establish a connection to the SFTP-Server after a total of 12 retries in a 5-minute interval (60 minutes after start).
+The container will **stop** after start if the startup script can't successfully establish a connection to the SFTP-Server or doesn't find folders for backup and logs.
 If you haven't provided keys beforehand it is expected for the container to stop after the first start. Just start it again once your SFTP-Server is configured to use the public key.
-
-Make sure that the folder `backup` exists in the root folder of your SFTP-User (see [requirements](#requirements)).
-If you want to get the logs that are created by the backup script on your SFTP-Server, you can create a folder `logs` in your SFTP-Users root directory. Logs will be synced to this location before and after each backup.
 
 
 ## Environment variables and volumes
@@ -94,7 +89,9 @@ If you want to get the logs that are created by the backup script on your SFTP-S
 |backup_frequency|See Crontab |Optional|See https://crontab.guru|10 3 * * *
 |backup_retention_number|number| Optional|Keeps last X (daily) Backups|7
 |backup_logsync_intervall|number |Optional|Intervall to sync logs to origin server while the backup process is running in seconds.|10s
-|backup_rsync_custom_flags|string|Optional |Set custom rsync flags, the following are always set: -avq --no-perms --delete --stats|
+|backup_rsync_custom_flags|string|Optional|Custom rsync flags, the following are always set: -avq --no-perms --delete --stats|
+|sftp_backup_folder|string|Optional|Folder location of the remote backup folder|/backup/
+|sftp_logs_folder|string|Optional|Folder location of the remote logs folder|/logs/
 |TZ|Continent/City|Optional|Timezone (see [Wikipedia](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones))|Europe/Berlin
 
 Mandatory variables have to be declared, otherwise the container will stop after a healthcheck.
@@ -114,7 +111,7 @@ The container **won't stop** if a backup fails or the SFTP server isn't reachabl
 - **Please note:** If there's an rsync error in the backup process, the incomplete backup will be deleted to keep data integrety. The script won't try again automatically (until it's executed again by cron).
 - **Limitation**: There will only be one backup per day, as this is how the scripts are designed. Even if you modify the cronjob to run multiple times a day, the existing backup will just be overwritten, but not saved separately.
 	- You can on the other hand use a crontab format that creates backups less often than every day, for example every two days or every week
-- If theres a file `file.lock` in the `backup/` folder on the SFTP server the script will wait until the files is deleted (check every 60 seconds).
+- If theres a file `file.lock` in the `/backup/` folder on the SFTP server the script will wait until the files is deleted (check every 60 seconds).
 This is useful if you for example backup a backup and you don't want to transfer incomplete or inconsistent data. 
 Just create a file called `file.lock`for the duration the contents of the directory are changed and remove it afterwards (easy to automate if you for example use a script).
 - You can run `docker exec sftp-backup backup-now` to manually start a backup

@@ -1,11 +1,10 @@
 #!/bin/bash
-sftp_backup_folder="/mnt/sftp/backup/"
-sftp_folder="/mnt/sftp/"
-remote_logs_folder="/mnt/sftp/logs/"
 dest_folder="/mnt/local/"
 logs_folder="/config/logs/"
 lock_delay=60
 
+default_sftp_backup_folder="/backup/"
+default_sftp_logs_folder="/logs/"
 default_backup_retention_number=7
 default_backup_bwlimit=4M
 default_backup_logsync_intervall=10
@@ -19,7 +18,7 @@ set_defaults() {
   done
 }
 
-set_defaults backup_retention_number backup_bwlimit backup_logsync_intervall
+set_defaults backup_retention_number backup_bwlimit backup_logsync_intervall sftp_backup_folder sftp_logs_folder
 
 time_now () {
   date "+%T"

@@ -1,9 +1,5 @@
 #!/bin/bash
 
-# Set variables
-retry_delay=5m
-retry_count=12
-
 # Import output library
 . /home/scripts/global_functions.sh
 
@@ -13,6 +9,18 @@ echo_key () {
   echo
   echo $(cat /config/id_rsa.pub)
   echo
+}
+
+check_sftp_folder () {
+  folder="$1"
+  if rsync -q -e "ssh -p $backup_port -i /home/ssh/id_rsa -o StrictHostKeyChecking=no -o BatchMode=yes" $backup_user@$backup_server:$folder
+  then
+    ok "Connected via SFTP and found folder $folder"
+    return 0
+  else
+    error "Couldn't connect via SFTP or folder $folder is missing!"
+    return 1
+  fi
 }
 
 info "Starting Selfcheck."
@@ -27,60 +35,17 @@ else
   rm -rf /home/ssh/* /config/id_rsa*
   ssh-keygen -t rsa -b 4096 -f ssh_host_rsa_key -q -N ""  -f /home/ssh/id_rsa  < /dev/null
   cp /home/ssh/id_rsa* /config/
-  ok "Success generation keys. Stopping container. Please use key:"
+  ok "Successfully generated keys. Stopping container. Please use the following public key:"
   echo_key
   exit 1
 fi
-info "Checking SFTP connection..."
 
-mount_sftp
-sleep 1
-
-
-check_sftp () {
-  mountpoint -q $sftp_folder
-  return
-}
-
-check_sftp_backup_folder () {
-  if [ ! -d "$sftp_backup_folder" ]
-  then
-    error "Sucessfully connted via SFTP, but mandatory folder \"backup/\" is missing!"
-    error "Please check your configuration and try again!"
-    umount -lf /mnt/sftp/
-    selfcheck_fail=1
-    exit 1
-  else
-    ok "SFTP configuration ok."
-    umount -lf /mnt/sftp/
-    exit 0
-  fi
-}
-
-info "Checking mounted folders..."
-if check_sftp
-then
-  check_sftp_backup_folder
+info "Checking SFTP connection."
+if check_sftp_folder $sftp_backup_folder && check_sftp_folder $sftp_logs_folder ; then
+  ok "Connection tested successfully."
+  exit 0
 else
-  error "Couldn't mount SFTP folder."
-  warn "Trying again in $retry_delay for $retry_count times!"
-  try=1
-  while [ "$try" -le "$retry_count" ]
-  do
-    sleep $retry_delay
-    warn "Starting retry $try/$retry_count..."
-    try=$((try + 1))
-    mount_sftp
-    sleep 1
-    if check_sftp
-    then 
-      check_sftp_backup_folder
-    fi
-    if [ "$try" -lt "$retry_count" ]
-    then
-      warn "Retry failed. Trying again in $retry_delay."
-    fi
-  done
-  error "SFTP folder couldn't be mounted at last try."
+  error "See above errors for details."
+  selfcheck_fail=1
   exit 1
 fi
