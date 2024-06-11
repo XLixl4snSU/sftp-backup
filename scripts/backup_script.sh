@@ -9,7 +9,13 @@ date_today=$(date "+%d.%m.%Y")
 . /home/scripts/global_functions.sh
 
 sync_logs() {
-    rsync -e "ssh -p $backup_port -i /home/ssh/id_rsa" -r $logs_folder $backup_user@$backup_server:/logs/
+    rsync_log_flags=(
+        -e "ssh -p $backup_port -i /home/ssh/id_rsa"
+        -r
+        $logs_folder
+        $backup_user@$backup_server:$sftp_logs_folder
+    )
+    rsync "${rsync_log_flags[@]}"
 }
 
 background_sync() {
@@ -27,27 +33,76 @@ end() {
     echo
     kill $sync_pid
     sync_logs
-    umount -lf /mnt/sftp/
     exit 0
 }
 
 run_rsync() {
     echo "$backup_start_date" > $dest_folder.running_backup
-    echo "$rsync_flags" >> $dest_folder.running_backup
+    echo "$last_backup" >> $dest_folder.running_backup
     while :
     do
-        rsync $rsync_flags && break
+        rsync "${rsync_flags[@]}" && break
         error "rsync reported an error. Trying again in 60s... (If this error reappears multiple times there could be something wrong with the configuration or the connection.)"
         sleep 60
     done
-    ok "rsync finished successfully"
+    ok "rsync finished successfully"y
     rm -rf $dest_folder.running_backup
     cleanup_and_storage_info
 }
 
+initial_backup() {
+    mkdir -p $dest_folder$backup_start_date
+    rsync_flags=(
+        -avq
+        $backup_rsync_custom_flags
+        --no-perms
+        --delete
+        --timeout=300
+        --stats
+        --log-file=$logs_folder"rsync-"$backup_start_date".log"
+        --bwlimit=$backup_bwlimit
+        -e "ssh -p $backup_port -i /home/ssh/id_rsa"
+        $backup_user@$backup_server:$sftp_backup_folder
+        $dest_folder$backup_start_date
+    )
+    run_rsync
+}
+
 incremental_backup() {
     get_last_backup
-    rsync_flags="-avq $backup_rsync_custom_flags --no-perms --delete --timeout=300 --stats --log-file $logs_folder"rsync-"$backup_start_date".log" --bwlimit $backup_bwlimit --link-dest=$dest_folder$last_backup/ -e "ssh -p $backup_port -i /home/ssh/id_rsa" $backup_user@$backup_server:/backup/ $dest_folder$backup_start_date"
+    rsync_flags=(
+        -avq
+        $backup_rsync_custom_flags
+        --no-perms
+        --delete
+        --timeout=300
+        --stats
+        --log-file=$logs_folder"rsync-"$backup_start_date".log"
+        --bwlimit=$backup_bwlimit
+        --link-dest=$dest_folder$last_backup/
+        -e "ssh -p $backup_port -i /home/ssh/id_rsa"
+        $backup_user@$backup_server:$sftp_backup_folder
+        $dest_folder$backup_start_date
+    )
+    run_rsync
+}
+
+resume_backup() {
+    last_backup="$(head -2 $dest_folder.running_backup | tail +2)"
+    rsync_flags=(
+        -avq
+        $backup_rsync_custom_flags
+        --no-perms
+        --delete
+        --timeout=300
+        --stats
+        --log-file=$logs_folder"rsync-"$backup_start_date".log"
+        --bwlimit=$backup_bwlimit
+        --link-dest=$dest_folder$last_backup/
+        -e "ssh -p $backup_port -i /home/ssh/id_rsa"
+        $backup_user@$backup_server:$sftp_backup_folder
+        $dest_folder$backup_start_date
+    )
     run_rsync
 }
 
@@ -69,18 +124,6 @@ get_last_backup() {
             days=$(($days + 1))
         fi
     done
-}
-
-resume_backup() {
-    rsync_flags="$(head -2 $dest_folder.running_backup | tail +2)"
-    warn "Rsync flags: $rsync_flags"
-    run_rsync
-}
-
-initial_backup() {
-    mkdir -p $dest_folder$backup_start_date
-    rsync_flags="-avq $backup_rsync_custom_flags --no-perms --delete --stats --log-file $logs_folder"rsync-"$backup_start_date".log" --bwlimit $backup_bwlimit -e "ssh -p $backup_port -i /home/ssh/id_rsa" $backup_user@$backup_server:/backup/ $dest_folder$backup_start_date"
-    run_rsync
 }
 
 cleanup_and_storage_info() {
@@ -131,6 +174,13 @@ cleanup_and_storage_info() {
     end
 }
 
+#Check if Selfcheck is still running
+
+if pgrep -x "selfcheck.sh" > /dev/null ; then
+    error "Healthcheck still running, please wait until healtcheck has finished."
+    exit 1
+fi
+
 # ------- Start of Backup --------
 # Start intervall sync of logs
 background_sync &
@@ -139,27 +189,21 @@ sync_pid=$!
 echo "---------------   Start backup log $date_today (Using v$backup_version)   -------------------------"
 info "Starting Backup-Script..."
 info "Using bandwith limit: $backup_bwlimit"
-info "Mounting SFTP folder."
-# SFTP:
-mount_sftp
-# Check Mountpoint:
-if mountpoint -q -- "$sftp_folder"; then
-    if [ ! -d "$sftp_backup_folder" ]; then
-        error "Sucessfully connted via SFTP, but mandatory folder \"backup/\" is missing!"
-        error "Please check and try again."
-        end
-    else
-        ok "Sucessfully mounted SFTP folder."
-    fi
+if rsync -q -e "ssh -p $backup_port -i /home/ssh/id_rsa" $backup_user@$backup_server:$sftp_backup_folder ; then
+    ok "Connected successfully to SFTP-Server"
 else
-    error "Error connection via SFTP. Folder could not be mounted. Aborting..."
-    error "Backup unsuccessful!"
+    error "There was an error establishing the SFTP connection or the backup folder is missing."
+    error "Please check and try again."
     end
 fi
 
 sync_logs
 
-while [ -f "$sftp_backup_folder"file.lock"" ]; do
+while true ; do
+    rsync -q -e "ssh -p $backup_port -i /home/ssh/id_rsa" $backup_user@$backup_server:$sftp_backup_folder"file.lock" &>/dev/null
+    if [ $? -ne 0 ]; then
+        break
+    fi
     warn "Lockfile detected. Checking again in $lock_delay seconds."
     sleep $lock_delay
 done
@@ -168,10 +212,13 @@ done
 if [ -f "$dest_folder.running_backup" ]; then
     running_backup=$(head -n 1 $dest_folder.running_backup)
     if cat $dest_folder.running_backup | grep -qE '[0-9]{4}-[0-9]{2}-[0-9]{2}' && [ -d $dest_folder$running_backup ]; then
-        warn "Unfinished backup from $running_backup found. Retrying this backup."
+        warn "Unfinished backup from $running_backup found. Continuing this backup."
         search_from_date=$running_backup
         backup_start_date=$running_backup
         resume_backup
+    else
+    warn "Running backup file corrupted. Deleting file."
+    rm "$dest_folder.running_backup"
     fi
 fi
 
