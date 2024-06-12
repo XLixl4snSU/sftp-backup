@@ -7,7 +7,7 @@ default_sftp_backup_folder="/backup/"
 default_sftp_logs_folder="/logs/"
 default_backup_retention_number=7
 default_backup_bwlimit=4M
-default_backup_logsync_intervall=10
+default_backup_logsync_intervall=60
 
 set_defaults() {
   for var in "$@"; do

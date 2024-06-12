@@ -88,8 +88,8 @@ If you haven't provided keys beforehand it is expected for the container to stop
 |backup_bwlimit|number and unit|Optional|Bandwith limit during the backup. Always add a unit, e.g. M = Megabyte|4M
 |backup_frequency|See Crontab |Optional|See https://crontab.guru|10 3 * * *
 |backup_retention_number|number| Optional|Keeps last X (daily) Backups|7
-|backup_logsync_intervall|number |Optional|Intervall to sync logs to origin server while the backup process is running in seconds.|10s
-|backup_rsync_custom_flags|string|Optional|Custom rsync flags, the following are always set: -avq --no-perms --delete --stats|
+|backup_logsync_intervall|number |Optional|Intervall to sync logs to origin server while the backup process is running in seconds.|60s
+|backup_rsync_custom_flags|string|Optional|Custom rsync flags, the following are always set: -rtvq --no-perms --delete --stats --progress|
 |sftp_backup_folder|string|Optional|Folder location of the remote backup folder|/backup/
 |sftp_logs_folder|string|Optional|Folder location of the remote logs folder|/logs/
 |TZ|Continent/City|Optional|Timezone (see [Wikipedia](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones))|Europe/Berlin
