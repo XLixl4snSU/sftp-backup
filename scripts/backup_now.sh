@@ -1,8 +1,22 @@
 #!/bin/bash
-trap abort INT
 
+. /home/scripts/global_functions.sh
+
+trap abort INT
 abort() {
     rm /tmp/backup.lock
 }
 
-flock -n /tmp/backup.lock /home/scripts/backup_script.sh |& tee /config/logs/backup_script-$(date +%F).log /var/log/container.log
+backup_running() {
+    error "There is already  backup running. Exiting."
+    exit 1
+}
+
+(
+flock -n 200 || backup_running
+ok "Starting backup script."
+/home/scripts/backup_script.sh |& tee /config/logs/backup_script-$(date +%F).log /var/log/container.log
+) 200>/tmp/backup.lock
+
+
+#flock -n /tmp/backup.lock start
