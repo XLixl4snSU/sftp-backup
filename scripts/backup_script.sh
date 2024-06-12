@@ -157,6 +157,10 @@ if pgrep -x "selfcheck.sh" > /dev/null ; then
     error "Healthcheck still running, please wait until healtcheck has finished."
     exit 1
 fi
+if pgrep -x "backup_script.sh" > /dev/null ; then
+    error "Backup Script already running, exting."
+    exit 1
+fi
 
 # ------- Start of Backup --------
 # Start intervall sync of logs
