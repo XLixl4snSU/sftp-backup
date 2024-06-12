@@ -39,9 +39,21 @@ end() {
 run_rsync() {
     echo "$backup_start_date" > $dest_folder.running_backup
     echo "$last_backup" >> $dest_folder.running_backup
+    rsync_flags=(
+        -e "ssh -p $backup_port -i /home/ssh/id_rsa"
+        -rtvq
+        --delete
+        --stats
+        --progress
+        --log-file=$logs_folder"rsync-"$backup_start_date".log"
+        --bwlimit=$backup_bwlimit
+        $backup_rsync_custom_flags
+        $backup_user@$backup_server:$sftp_backup_folder
+        $dest_folder$backup_start_date
+    )
     while :
     do
-        rsync "${rsync_flags[@]}" && break
+        rsync "${rsync_additional_flags[@]}" "${rsync_flags[@]}" && break
         error "rsync reported an error. Trying again in 60s... (If this error reappears multiple times there could be something wrong with the configuration or the connection.)"
         sleep 60
     done
@@ -52,56 +64,21 @@ run_rsync() {
 
 initial_backup() {
     mkdir -p $dest_folder$backup_start_date
-    rsync_flags=(
-        -avq
-        $backup_rsync_custom_flags
-        --no-perms
-        --delete
-        --timeout=300
-        --stats
-        --log-file=$logs_folder"rsync-"$backup_start_date".log"
-        --bwlimit=$backup_bwlimit
-        -e "ssh -p $backup_port -i /home/ssh/id_rsa"
-        $backup_user@$backup_server:$sftp_backup_folder
-        $dest_folder$backup_start_date
-    )
     run_rsync
 }
 
 incremental_backup() {
     get_last_backup
-    rsync_flags=(
-        -avq
-        $backup_rsync_custom_flags
-        --no-perms
-        --delete
-        --timeout=300
-        --stats
-        --log-file=$logs_folder"rsync-"$backup_start_date".log"
-        --bwlimit=$backup_bwlimit
+    rsync_additional_flags=(
         --link-dest=$dest_folder$last_backup/
-        -e "ssh -p $backup_port -i /home/ssh/id_rsa"
-        $backup_user@$backup_server:$sftp_backup_folder
-        $dest_folder$backup_start_date
     )
     run_rsync
 }
 
 resume_backup() {
     last_backup="$(head -2 $dest_folder.running_backup | tail +2)"
-    rsync_flags=(
-        -avq
-        $backup_rsync_custom_flags
-        --no-perms
-        --delete
-        --timeout=300
-        --stats
-        --log-file=$logs_folder"rsync-"$backup_start_date".log"
-        --bwlimit=$backup_bwlimit
+    rsync_additional_flags=(
         --link-dest=$dest_folder$last_backup/
-        -e "ssh -p $backup_port -i /home/ssh/id_rsa"
-        $backup_user@$backup_server:$sftp_backup_folder
-        $dest_folder$backup_start_date
     )
     run_rsync
 }
