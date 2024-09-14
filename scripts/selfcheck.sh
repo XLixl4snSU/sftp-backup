@@ -24,6 +24,10 @@ check_sftp_folder () {
 }
 
 info "Starting Selfcheck."
+info "Starting OliveTine"
+
+OliveTin &
+
 mkdir -p /config/logs
 if [ -f "/config/id_rsa.pub" ] && [ -f "/config/id_rsa" ]; then
   ok "Keys already exist. Using existing keys.."

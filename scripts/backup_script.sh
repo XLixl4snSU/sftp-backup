@@ -5,7 +5,6 @@ date_today=$(date "+%d.%m.%Y")
 
 # ------- Helper Functions:--------
 # Import Output Functions
-
 . /home/scripts/global_functions.sh
 
 sync_logs() {
@@ -23,7 +22,8 @@ background_sync() {
         background_sync_running=true
         while true; do
             sync_logs
-            sleep $backup_logsync_intervall
+            sleep $backup_logsync_intervall &
+            wait
         done
     fi
 }
@@ -31,9 +31,12 @@ background_sync() {
 end() {
     echo "---------------   End of backup log $date_today   ---------------------------------------"
     echo
+    pkill -KILL -P $sync_pid
     kill $sync_pid
     sync_logs
-    exit 0
+    ok "Synced logs."
+    /home/scripts/list_backups.sh > /dev/null 2>&1 &
+    exit
 }
 
 run_rsync() {
@@ -57,7 +60,7 @@ run_rsync() {
         error "rsync reported an error. Trying again in 60s... (If this error reappears multiple times there could be something wrong with the configuration or the connection.)"
         sleep 60
     done
-    ok "rsync finished successfully"y
+    ok "rsync finished successfully"
     rm -rf $dest_folder.running_backup
     cleanup_and_storage_info
 }
@@ -122,21 +125,7 @@ cleanup_and_storage_info() {
         days=$(($days + 1))
     done
     echo
-    echo "------------  Storage Information  ------------------"
-    echo "Total: $(du -sh $dest_folder | awk '{print $1}'), actual size distribution of individual folders:"
-    echo
-    echo "$(remove_path_from_filename "$(convert_date_to_readable "$(du -sh $dest_folder* | grep -E '[0-9]{4}-[0-9]{2}-[0-9]{2}')")")" | awk '{print $2 ": " $1}'
-    echo
-    echo "Total size of each backup independently:"
-    echo
-    for d in $dest_folder*; do
-        if [ -d "$d" ] && [[ $d =~ ^.*/[[:digit:]]{4}-[[:digit:]]{2}-[[:digit:]]{2}$ ]]; then
-            echo $(convert_date_to_readable $(du -sh $d | awk -F" +|/" '{print $NF}'))": "$(du -sh $d | awk '{print $1}')
-        fi
-    done
-    echo
-    df -h $dest_folder
-    echo "------------  End of Storage Information  -----------"
+    storage_information
     echo
     info "Keeping the following backups: $list"
     # Delete backups out of retention
@@ -162,9 +151,11 @@ if pgrep -x "backup_script.sh" > /dev/null ; then
     exit 1
 fi
 
+/home/scripts/list_backups.sh > /dev/null 2>&1 &
+
 # ------- Start of Backup --------
 # Start intervall sync of logs
-background_sync &
+background_sync > /dev/null 2>&1 &
 sync_pid=$!
 
 echo "---------------   Start backup log $date_today (Using v$backup_version)   -------------------------"
@@ -183,6 +174,7 @@ sync_logs
 while true ; do
     rsync -q -e "ssh -p $backup_port -i /home/ssh/id_rsa" $backup_user@$backup_server:$sftp_backup_folder"file.lock" &>/dev/null
     if [ $? -ne 0 ]; then
+        ok "No lockfile deteced. Starting backup."
         break
     fi
     warn "Lockfile detected. Checking again in $lock_delay seconds."

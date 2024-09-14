@@ -20,6 +20,7 @@ echo "">/var/log/container.log
 echo "------------ Start container log ------------"
 
 /home/scripts/cron_update.sh
+/home/scripts/list_backups.sh
 /home/scripts/selfcheck.sh
 selfcheck_status=$?
 

@@ -29,8 +29,10 @@ This project is the base for a docker container that provides the possibility to
  - Rudimentary incremental Backups with a custom retention period in days
  - Authentication by SSH-Keys
  - Easily accessible Logs with extensive information of the process
+ - Webinterface for essential management tasks
+
 ## Requirements, Installation and Setup
-This project is the base of of Docker container. You can pull the image from DockerHub and GitHub Container Repository, but also build it locally.
+This project is the base of a Docker container. You can pull the image from DockerHub and GitHub Container Repository, but also build it locally.
 ### Requirements:
  - Docker installed on your host machine. See https://docs.docker.com/engine/install/ for instructions.
  - SFTP-Server that supports authentication via RSA-SSH-Keys (basically all should do) and the rsync command.
@@ -58,11 +60,11 @@ Download a release, extract it and run the following command in the root folder:
     docker build .
 
 ### First Start
-See [Environment variables and volumes](#Environment-variables-and-volumes) for the flags you need to run the container.
+See [Environment variables, volumes and ports](#Environment-variables,-volumes-and-ports) for the flags you need to run the container.
 
 Example:
 
-    docker run --name sftp-backup -e "backup_port=2025" -e "backup_user=myusername" -e "backup_server=sftp.domain.com" -v "/path/to/local/folder/config:/config" -v "/path/to/local/folder/local:/mnt/local/" -d butti/sftp-backup:latest
+    docker run --name sftp-backup -p 1337:1337 -e "backup_port=2025" -e "backup_user=myusername" -e "backup_server=sftp.domain.com" -v "/path/to/local/folder/config:/config" -v "/path/to/local/folder/local:/mnt/local/" -d butti/sftp-backup:latest
     
 
 When you start the container for the first time, it will create **SSH-Keys** (if they don't already exist). These will be located in your mounted config-folder.
@@ -72,20 +74,19 @@ You now have to use this public key and add it as a authentication method on you
 The container will **stop** after start if the startup script can't successfully establish a connection to the SFTP-Server or doesn't find folders for backup and logs.
 If you haven't provided keys beforehand it is expected for the container to stop after the first start. Just start it again once your SFTP-Server is configured to use the public key.
 
+There is a simple **Webinterface** for most common actions required to manage the container, e.g. starting a backup, deleting old logs or showing existing logs.
 
-## Environment variables and volumes
 
-|Mandatory volumes|Host path|Container path|
-|--|--|--| 
-|backup folder|as you wish|/mnt/local|
-|config folder (SSH-Keys & Logs)|as you wish|/config|
----
+## Environment variables, volumes and ports
+
+##### Variables
 |Variable|Format|Mandatory?|Info|Default value
 |--|--|--|--|--|
 |backup_server|domain.com \| IP|Yes| URL or IP of the SFTP server|-
 |backup_port|number (0-65535)|Yes|Port SFTP server|-
 |backup_user|String|Yes|SFTP username|-
-|backup_bwlimit|number and unit|Optional|Bandwith limit during the backup. Always add a unit, e.g. M = Megabyte|4M
+|backup_bwlimit|number and unit|Optional|Bandwith limit during the backup. Always add a unit, e.g. 4M = 4 Megabyte|0 (unlimited)
+|lock_delay|number in seconds|Optional|Retry time when a lockfile is detected|300
 |backup_frequency|See Crontab |Optional|See https://crontab.guru|10 3 * * *
 |backup_retention_number|number| Optional|Keeps last X (daily) Backups|7
 |backup_logsync_intervall|number |Optional|Intervall to sync logs to origin server while the backup process is running in seconds.|60s
@@ -95,6 +96,19 @@ If you haven't provided keys beforehand it is expected for the container to stop
 |TZ|Continent/City|Optional|Timezone (see [Wikipedia](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones))|Europe/Berlin
 
 Mandatory variables have to be declared, otherwise the container will stop after a healthcheck.
+
+---
+##### Volumes
+|Mandatory volumes|Host path|Container path|
+|--|--|--| 
+|backup folder|as you wish|/mnt/local|
+|config folder (SSH-Keys & Logs)|as you wish|/config|
+---
+
+##### Ports
+|type|host port|container port
+|--|--|--
+|OliveTin Webinterface|as you wish|1337
 
 
 ## Running the container
@@ -114,4 +128,4 @@ The container **won't stop** if a backup fails or the SFTP server isn't reachabl
 - If theres a file `file.lock` in the `/backup/` folder on the SFTP server the script will wait until the files is deleted (check every 60 seconds).
 This is useful if you for example backup a backup and you don't want to transfer incomplete or inconsistent data. 
 Just create a file called `file.lock`for the duration the contents of the directory are changed and remove it afterwards (easy to automate if you for example use a script).
-- You can run `docker exec sftp-backup backup-now` to manually start a backup
+- You can run `docker exec sftp-backup backup-now` to manually start a backup or use the OliveTin webinterface provied

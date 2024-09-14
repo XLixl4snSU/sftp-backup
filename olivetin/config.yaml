@@ -1,0 +1,69 @@
+showNavigation: true
+InsecureAllowDumpVars: true 
+logLevel: "DEBUG"
+entities:
+
+  - file: /etc/OliveTin/logfile_list.json
+    name: logfilelist
+
+  - file: /etc/OliveTin/backup_list.json
+    name: backuplist
+
+actions:
+  - title: Show logs
+    shell: 'cat /config/logs/{{ logtype }}-{{ logfiledate }}.log'
+    icon: "&#128203;"
+    popupOnStart: execution-dialog-stdout-only
+    arguments:
+      - name: logfiledate
+        entity: logfilelist
+        title: 'Select Date'
+        choices:
+          - value: '{{ logfilelist.date }}'
+            title: '{{ logfilelist.readable_log_Date }}'
+      - name: logtype
+        title: 'Select type of log'
+        choices:
+          - title: backup script log
+            value: backup_script
+          - title: rsync log
+            value: rsync
+  - title: Start Backup
+    shell: 'backup-now'
+    popupOnStart: execution-dialog-stdout-only
+    timeout: 10
+    maxConcurrent: 1
+    icon: "&#128190;"
+    arguments:
+      - type: confirmation
+        title: Are you sure?
+  - title: Delete individual backup
+    shell: 'rm -rv {{ backupdate }} && /home/scripts/list_backups.sh && echo "Deleted backup successfully."'
+    icon: "&#128465;"
+    popupOnStart: execution-dialog-stdout-only
+    arguments:
+      - name: backupdate
+        entity: backuplist
+        title: 'Select Date'
+        choices:
+          - value: '{{ backuplist.folderPath }}'
+            title: '{{ backuplist.readableDate }}'
+      - type: confirmation
+        title: Are you sure?
+  - title: Show storage information
+    shell: bash -c 'source /home/scripts/global_functions.sh; storage_information'
+    icon: "&#128436;"
+    popupOnStart: execution-dialog-stdout-only
+  - title: Check backup script status
+    shell: bash -c 'source /home/scripts/global_functions.sh; check_backup_script_status'
+    icon: "&#63;"
+    popupOnStart: execution-dialog-stdout-only
+  - title: Purge logs
+    shell: bash -c 'source /home/scripts/global_functions.sh; purge_old_logs {{ numberofdays }}'
+    icon: "&#10060;"
+    popupOnStart: execution-dialog-stdout-only
+    arguments:
+      - name: numberofdays
+        description: Delete logs older than X days.
+        title: Number of days
+        type: int

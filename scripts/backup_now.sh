@@ -17,6 +17,3 @@ flock -n 200 || backup_running
 ok "Starting backup script."
 /home/scripts/backup_script.sh |& tee /config/logs/backup_script-$(date +%F).log /var/log/container.log
 ) 200>/tmp/backup.lock
-
-
-#flock -n /tmp/backup.lock start
