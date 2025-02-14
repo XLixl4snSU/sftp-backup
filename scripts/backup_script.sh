@@ -49,7 +49,6 @@ run_rsync() {
         --stats
         --progress
         --log-file=$logs_folder"rsync-"$backup_start_date".log"
-        --bwlimit=$backup_bwlimit
         $backup_rsync_custom_flags
         $backup_user@$backup_server:$sftp_backup_folder
         $dest_folder$backup_start_date
