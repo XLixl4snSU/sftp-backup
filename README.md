@@ -85,7 +85,6 @@ There is a simple **Webinterface** for most common actions required to manage th
 |backup_server|domain.com \| IP|Yes| URL or IP of the SFTP server|-
 |backup_port|number (0-65535)|Yes|Port SFTP server|-
 |backup_user|String|Yes|SFTP username|-
-|backup_bwlimit|number and unit|Optional|Bandwith limit during the backup. Always add a unit, e.g. 4M = 4 Megabyte|0 (unlimited)
 |lock_delay|number in seconds|Optional|Retry time when a lockfile is detected|300
 |backup_frequency|See Crontab |Optional|See https://crontab.guru|10 3 * * *
 |backup_retention_number|number| Optional|Keeps last X (daily) Backups|7

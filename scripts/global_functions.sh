@@ -6,7 +6,6 @@ default_lock_delay=300
 default_sftp_backup_folder="/backup/"
 default_sftp_logs_folder="/logs/"
 default_backup_retention_number=7
-default_backup_bwlimit=0
 default_backup_logsync_intervall=60
 
 set_defaults() {
@@ -18,7 +17,7 @@ set_defaults() {
   done
 }
 
-set_defaults backup_retention_number backup_bwlimit backup_logsync_intervall sftp_backup_folder sftp_logs_folder lock_delay
+set_defaults backup_retention_number backup_logsync_intervall sftp_backup_folder sftp_logs_folder lock_delay
 
 time_now () {
   date "+%T"

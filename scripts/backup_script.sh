@@ -159,7 +159,6 @@ sync_pid=$!
 
 echo "---------------   Start backup log $date_today (Using v$backup_version)   -------------------------"
 info "Starting Backup-Script..."
-info "Using bandwith limit: $backup_bwlimit"
 if rsync -q -e "ssh -p $backup_port -i /home/ssh/id_rsa" $backup_user@$backup_server:$sftp_backup_folder ; then
     ok "Connected successfully to SFTP-Server"
 else
